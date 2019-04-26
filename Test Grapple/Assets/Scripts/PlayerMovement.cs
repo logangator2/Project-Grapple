@@ -26,8 +26,8 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         // Non-Physics steps
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
+        float horizontalMovement = Input.GetAxisRaw("Horizontal");
+        float verticalMovement = Input.GetAxisRaw("Vertical");
 
         moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
     }

@@ -4,6 +4,7 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 
     Camera Camera;
+    Quaternion mouseMovement;
 
     void Start ()
     {
@@ -18,6 +19,9 @@ public class CameraController : MonoBehaviour {
             // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); - unity doc
         }
         // print(Input.mousePosition);
-        transform.rotation = Quaternion.Euler(Input.mousePosition);
+
+        mouseMovement = Quaternion.LookRotation(Input.mousePosition, Vector3.up);
+        transform.rotation = mouseMovement;
+        // transform.LookAt(Input.mousePosition);
     }
 }
