@@ -1,27 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraController : MonoBehaviour {
+// Performs a mouse look.
 
-    Camera Camera;
-    Quaternion mouseMovement;
+public class CameraController : MonoBehaviour
+{
+    public float minX = -80f;
+    public float maxX = 80f;
+    public float horizontalSpeed = 2.0f;
+    public float verticalSpeed = 2.0f;
 
-    void Start ()
+    private float h, v;
+
+    void Update()
     {
-        
-    }
-    
-    void Update ()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            // if grapple not activated, shoot grapple
-            // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); - unity doc
-        }
-        // print(Input.mousePosition);
+        // Get horizontal and vertical movement
+        h = horizontalSpeed * Input.GetAxis("Mouse X");
+        v = verticalSpeed * Input.GetAxis("Mouse Y");
 
-        mouseMovement = Quaternion.LookRotation(Input.mousePosition, Vector3.up);
-        transform.rotation = mouseMovement;
-        // transform.LookAt(Input.mousePosition);
+        // lock x rotation
+        v = Mathf.Clamp(v, minX, maxX);
+
+        transform.Rotate(-v, h, 0);
     }
 }
