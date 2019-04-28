@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
 
     public float walkSpeed;
+    private float horizontalMovement, verticalMovement;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -20,8 +21,8 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         // Non-Physics steps
-        float horizontalMovement = Input.GetAxisRaw("Horizontal");
-        float verticalMovement = Input.GetAxisRaw("Vertical");
+        horizontalMovement = Input.GetAxisRaw("Horizontal");
+        verticalMovement = Input.GetAxisRaw("Vertical");
 
         moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
     }
