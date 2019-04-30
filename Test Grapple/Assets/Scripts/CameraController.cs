@@ -5,6 +5,8 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour
 {
+    public float minX = -80f;
+    public float maxX = 80f;
     public float horizontalSpeed = 2.0f;
     public float verticalSpeed = 2.0f;
     public Transform Player;
@@ -14,15 +16,18 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         // Get horizontal and vertical movement
-        h = horizontalSpeed * Input.GetAxis("Mouse X");
-        v = verticalSpeed * Input.GetAxis("Mouse Y");
-
-        transform.Rotate(-v, h, 0);
+        h = horizontalSpeed * Input.GetAxisRaw("Mouse X");
+        v = -(verticalSpeed * Input.GetAxisRaw("Mouse Y"));
+            
+        // FIXME: Need some way to prevent the rotation of the x axis to go above 80 degrees or below -80
+        // ... otherwise this messes up the camera
+        transform.Rotate(v, h, 0);
+        Player.transform.Rotate(0, h, 0);
 
         // from: https://forum.unity.com/threads/how-to-lock-or-set-the-cameras-z-rotation-to-zero.68932/
         // cancels out any z rotation; for some reason the transform above...
         // doesn't do the trick
-        float z = transform.eulerAngles.z;
+        z = transform.eulerAngles.z;
         transform.Rotate(0, 0, -z);
     }
 
