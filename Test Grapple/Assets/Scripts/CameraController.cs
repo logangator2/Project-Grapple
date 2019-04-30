@@ -2,41 +2,67 @@
 using System.Collections;
 
 // Performs a mouse look.
+// some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
+// FPS camera movement from: https://answers.unity.com/questions/1087351/limit-vertical-rotation-of-camera.html
 
 public class CameraController : MonoBehaviour
 {
-    public float minX = -80f;
-    public float maxX = 80f;
-    public float horizontalSpeed = 2.0f;
-    public float verticalSpeed = 2.0f;
+
+    public float SpeedH = 10f;
+    public float SpeedV = 10f;
+    public float walkSpeed;
     public Transform Player;
 
-    private float h, v, z;
+    private float yaw = 0f;
+    private float pitch = 0f;
+    private float minPitch = -30f;
+    private float maxPitch = 60f;
+    private float horizontalMovement, verticalMovement;
+
+    Rigidbody rb;
+    Vector3 moveDirection;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     void Update()
     {
-        // Get horizontal and vertical movement
-        h = horizontalSpeed * Input.GetAxisRaw("Mouse X");
-        v = -(verticalSpeed * Input.GetAxisRaw("Mouse Y"));
-            
-        // FIXME: Need some way to prevent the rotation of the x axis to go above 80 degrees or below -80
-        // ... otherwise this messes up the camera
-        transform.Rotate(v, h, 0);
-        Player.transform.Rotate(0, h, 0);
+        // Non-Physics steps
 
-        // from: https://forum.unity.com/threads/how-to-lock-or-set-the-cameras-z-rotation-to-zero.68932/
-        // cancels out any z rotation; for some reason the transform above...
-        // doesn't do the trick
-        z = transform.eulerAngles.z;
-        transform.Rotate(0, 0, -z);
+        CameraRotate();
+
+        // compute movement direction
+        horizontalMovement = Input.GetAxisRaw("Horizontal");
+        verticalMovement = Input.GetAxisRaw("Vertical");
+
+        moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
+        // to prevent accidental "flying"
+        moveDirection.y = 0;
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
-        // from: https://answers.unity.com/questions/884006/camera-not-rotate-when-following-player.html
-        if (Player != null)
-        {
-            transform.position = Player.position;
-        }
+        // Physics steps
+        Move();
+    }
+
+    void CameraRotate()
+    {
+        yaw += Input.GetAxis("Mouse X") * SpeedH;
+        pitch -= Input.GetAxis("Mouse Y") * SpeedV;
+        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        transform.eulerAngles = new Vector3(pitch, yaw, 0f);
+    }
+
+    void Move()
+    {
+        // to fix falling slowly
+        Vector3 yVelFix = new Vector3(0, rb.velocity.y, 0);
+        // to move normally
+        rb.velocity = moveDirection * walkSpeed * Time.deltaTime;
+        // adding fixed fall velocity
+        rb.velocity += yVelFix;
     }
 }
