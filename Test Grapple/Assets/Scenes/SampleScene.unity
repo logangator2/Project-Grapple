@@ -533,7 +533,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedH: 10
   SpeedV: 10
-  walkSpeed: 100
+  walkSpeed: 200
+  sprintSpeed: 400
   Player: {fileID: 1216469216}
 --- !u!136 &562054828
 CapsuleCollider:
