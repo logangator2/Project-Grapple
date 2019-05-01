@@ -11,13 +11,15 @@ public class CameraController : MonoBehaviour
     public float SpeedV = 10f;
     public float walkSpeed;
     public float sprintSpeed;
+    public float jumpForce;
+    public float maxJumpCount;
     public Transform Player;
 
     private float yaw = 0f;
     private float pitch = 0f;
     private float minPitch = -30f;
     private float maxPitch = 60f;
-    private float horizontalMovement, verticalMovement, currentSpeed;
+    private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -40,7 +42,7 @@ public class CameraController : MonoBehaviour
         // to prevent accidental "flying"
         moveDirection.y = 0;
 
-        // set player speed
+        // set player speed, doesn't allow player to sprint backwards
         currentSpeed = walkSpeed;
         if(Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
@@ -49,6 +51,12 @@ public class CameraController : MonoBehaviour
         if(Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
+        }
+
+        // jumping
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump ();
         }
     }
 
@@ -66,6 +74,16 @@ public class CameraController : MonoBehaviour
         transform.eulerAngles = new Vector3(pitch, yaw, 0f);
     }
 
+    void Jump()
+    {
+        if (currentJumpCount != 0) 
+        {
+            // from https://www.noob-programmer.com/unity3d/how-to-make-player-object-jump-in-unity-3d/
+            rb.AddForce(new Vector3 (0, jumpForce, 0), ForceMode.Impulse);
+            currentJumpCount -= 1;
+        }
+    }
+
     void Move()
     {
         // to fix falling slowly
@@ -74,5 +92,21 @@ public class CameraController : MonoBehaviour
         rb.velocity = moveDirection * currentSpeed * Time.deltaTime;
         // adding fixed fall velocity
         rb.velocity += yVelFix;
+    }
+
+    // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
+    void OnCollisionEnter (Collision col)
+    {
+        // resets jumpCount
+        if(col.gameObject.tag == "Ground")
+        {
+            currentJumpCount = maxJumpCount;
+        }
+
+        // // reset posiiton to original position - a "teleport" to the starting position
+        // if (col.gameObject.name == "Reset")
+        // {
+        //     transform.position = new Vector3(0, 1, 0);
+        // }
     }
 }
