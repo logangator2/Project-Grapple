@@ -42,7 +42,7 @@ public class CameraController : MonoBehaviour
 
         // set player speed
         currentSpeed = walkSpeed;
-        if(Input.GetKey(KeyCode.LeftShift))
+        if(Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
         }
