@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.45130587, g: 0.50095624, b: 0.57319796, a: 1}
+  m_IndirectSpecularColor: {r: 0.45130533, g: 0.5009551, b: 0.5731969, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1650,7 +1650,7 @@ MonoBehaviour:
   sprintSpeed: 400
   jumpForce: 5
   maxJumpCount: 1
-  grappleLength: 1000
+  grappleLength: 100
   grappleSpeed: 1000
   Player: {fileID: 562054825}
   respawnPoint: {fileID: 170133715}
@@ -1665,8 +1665,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 1
-  m_Height: 3
+  m_Radius: 0.5
+  m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &630760024
