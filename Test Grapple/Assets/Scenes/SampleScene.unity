@@ -624,12 +624,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedH: 10
   SpeedV: 10
+  OOBHeight: 0
   walkSpeed: 200
   sprintSpeed: 400
   jumpForce: 5
   maxJumpCount: 1
   grappleLength: 100
   grappleSpeed: 1000
+  Player: {fileID: 0}
+  respawnPoint: {fileID: 0}
+  gameCanvas: {fileID: 0}
 --- !u!136 &562054828
 CapsuleCollider:
   m_ObjectHideFlags: 0

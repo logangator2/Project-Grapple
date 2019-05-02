@@ -10,13 +10,9 @@ public class CameraController : MonoBehaviour
 
     public float SpeedH = 10f;
     public float SpeedV = 10f;
-    public float walkSpeed;
-    public float sprintSpeed;
-    public float jumpForce;
-    public float maxJumpCount;
     public float OOBHeight = 0f;
-    public Transform Player;
-    public Transform respawnPoint;
+    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed;
+    public Transform Player, respawnPoint;
     public GameObject gameCanvas;
 
     private int collectCount = 0;
@@ -25,13 +21,21 @@ public class CameraController : MonoBehaviour
     private float minPitch = -30f;
     private float maxPitch = 60f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
+    private bool grappleUsed;
 
     Rigidbody rb;
     Vector3 moveDirection;
+    RaycastHit grappleHit;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        Cursor.visible = false;
+        grappleUsed = false;
     }
 
     // Non-Physics steps
@@ -58,15 +62,14 @@ public class CameraController : MonoBehaviour
             currentSpeed = walkSpeed;
         }
 
-        // jumping
-        if (Input.GetKeyDown(KeyCode.Space))
+        // get back cursor
+        // FIXME: later on, get a way to remove the cursor again
+        if (Input.GetKey(KeyCode.Escape))
         {
-            Jump ();
+            Cursor.visible = true;
         }
-        if (gameObject.transform.position.y < OOBHeight)
-        {
-            Player.transform.position = respawnPoint.position;
-        }
+
+        // FIXME: collectible stuff
         if (collectCount == 4)
         {
             gameCanvas.SetActive(true);
@@ -77,6 +80,42 @@ public class CameraController : MonoBehaviour
     {
         // Physics steps
         Move();
+
+        // jumping
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump ();
+        }
+        if (gameObject.transform.position.y < OOBHeight)
+        {
+            Player.transform.position = respawnPoint.position;
+        }
+
+        // shoot grapple
+        if (Input.GetMouseButtonDown(1))
+        {
+            Grapple();
+        }
+    }
+
+    // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
+    void OnCollisionEnter (Collision col)
+    {
+        // resets jumpCount
+        if(col.gameObject.tag == "Ground")
+        {
+            currentJumpCount = maxJumpCount;
+        }
+        // FIXME: collects pickups
+        if (col.gameObject.tag == "Pick Up")
+        {
+            collectCount++;
+        }
+
+        // if (col.gameObject.name == "SawBlade")
+        // {
+        //     transform.position = new Vector3(0, 51, -47.5f);
+        // }
     }
 
     void CameraRotate()
@@ -85,16 +124,6 @@ public class CameraController : MonoBehaviour
         pitch -= Input.GetAxis("Mouse Y") * SpeedV;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
         transform.eulerAngles = new Vector3(pitch, yaw, 0f);
-    }
-
-    void Jump()
-    {
-        if (currentJumpCount != 0) 
-        {
-            // from https://www.noob-programmer.com/unity3d/how-to-make-player-object-jump-in-unity-3d/
-            rb.AddForce(new Vector3 (0, jumpForce, 0), ForceMode.Impulse);
-            currentJumpCount -= 1;
-        }
     }
 
     void Move()
@@ -107,27 +136,29 @@ public class CameraController : MonoBehaviour
         rb.velocity += yVelFix;
     }
 
-    // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
-    void OnCollisionEnter (Collision col)
+    void Jump()
     {
-        // resets jumpCount
-        if(col.gameObject.tag == "Ground")
+        if (currentJumpCount != 0) 
         {
-            currentJumpCount = maxJumpCount;
+            // from https://www.noob-programmer.com/unity3d/how-to-make-player-object-jump-in-unity-3d/
+            rb.AddForce(new Vector3 (0, jumpForce, 0), ForceMode.Impulse);
+            currentJumpCount -= 1;
         }
-        if (col.gameObject.tag == "Pick Up")
-        {
-            collectCount++;
-        }
-        // if (col.gameObject.name == "SawBlade")
-        // {
-        //     transform.position = new Vector3(0, 51, -47.5f);
-        // }
+    }
 
-        // // reset posiiton to original position - a "teleport" to the starting position
-        // if (col.gameObject.name == "Reset")
-        // {
-        //     transform.position = new Vector3(0, 1, 0);
-        // }
+    void Grapple()
+    {
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out grappleHit, grappleLength))
+        {
+            // check for anchor status
+            if (grappleHit.collider.tag == "Anchor" && !grappleUsed)
+            {
+                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * grappleHit.distance, Color.yellow);
+                // send player towards point
+                // transform.Translate(Vector3.forward * Time.deltaTime * grappleSpeed);
+                transform.position = Vector3.Lerp(transform.position, grappleHit.transform.position , grappleSpeed * Time.deltaTime);
+                grappleUsed = true;
+            }
+        }
     }
 }
