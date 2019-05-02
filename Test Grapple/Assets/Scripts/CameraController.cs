@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
 // FPS camera movement from: https://answers.unity.com/questions/1087351/limit-vertical-rotation-of-camera.html
@@ -9,11 +10,15 @@ public class CameraController : MonoBehaviour
 
     public float SpeedH = 10f;
     public float SpeedV = 10f;
+    public float OOBHeight = 0f;
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed;
+    public Transform Player, respawnPoint;
+    public GameObject gameCanvas;
 
+    private int collectCount = 0;
     private float yaw = 0f;
     private float pitch = 0f;
-    private float minPitch = -80f;
+    private float minPitch = -30f;
     private float maxPitch = 60f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
     private bool grappleUsed;
@@ -48,11 +53,11 @@ public class CameraController : MonoBehaviour
 
         // set player speed, doesn't allow player to sprint backwards
         currentSpeed = walkSpeed;
-        if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
+        if(Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
         }
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if(Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
         }
@@ -62,6 +67,12 @@ public class CameraController : MonoBehaviour
         if (Input.GetKey(KeyCode.Escape))
         {
             Cursor.visible = true;
+        }
+
+        // FIXME: collectible stuff
+        if (collectCount == 4)
+        {
+            gameCanvas.SetActive(true);
         }
     }
 
@@ -73,7 +84,11 @@ public class CameraController : MonoBehaviour
         // jumping
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Jump();
+            Jump ();
+        }
+        if (gameObject.transform.position.y < OOBHeight)
+        {
+            Player.transform.position = respawnPoint.position;
         }
 
         // shoot grapple
@@ -91,11 +106,15 @@ public class CameraController : MonoBehaviour
         {
             currentJumpCount = maxJumpCount;
         }
+        // FIXME: collects pickups
+        if (col.gameObject.tag == "Pick Up")
+        {
+            collectCount++;
+        }
 
-        // // reset posiiton to original position - a "teleport" to the starting position
-        // if (col.gameObject.name == "Reset")
+        // if (col.gameObject.name == "SawBlade")
         // {
-        //     transform.position = new Vector3(0, 1, 0);
+        //     transform.position = new Vector3(0, 51, -47.5f);
         // }
     }
 
@@ -105,6 +124,16 @@ public class CameraController : MonoBehaviour
         pitch -= Input.GetAxis("Mouse Y") * SpeedV;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
         transform.eulerAngles = new Vector3(pitch, yaw, 0f);
+    }
+
+    void Move()
+    {
+        // to fix falling slowly
+        Vector3 yVelFix = new Vector3(0, rb.velocity.y, 0);
+        // to move normally
+        rb.velocity = moveDirection * currentSpeed * Time.deltaTime;
+        // adding fixed fall velocity
+        rb.velocity += yVelFix;
     }
 
     void Jump()
@@ -131,15 +160,5 @@ public class CameraController : MonoBehaviour
                 grappleUsed = true;
             }
         }
-    }
-
-    void Move()
-    {
-        // to fix falling slowly
-        Vector3 yVelFix = new Vector3(0, rb.velocity.y, 0);
-        // to move normally
-        rb.velocity = moveDirection * currentSpeed * Time.deltaTime;
-        // adding fixed fall velocity
-        rb.velocity += yVelFix;
     }
 }
