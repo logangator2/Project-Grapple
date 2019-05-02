@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
 // FPS camera movement from: https://answers.unity.com/questions/1087351/limit-vertical-rotation-of-camera.html
@@ -9,28 +10,28 @@ public class CameraController : MonoBehaviour
 
     public float SpeedH = 10f;
     public float SpeedV = 10f;
-    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed;
+    public float walkSpeed;
+    public float sprintSpeed;
+    public float jumpForce;
+    public float maxJumpCount;
+    public float OOBHeight = 0f;
+    public Transform Player;
+    public Transform respawnPoint;
+    public GameObject gameCanvas;
 
+    private int collectCount = 0;
     private float yaw = 0f;
     private float pitch = 0f;
-    private float minPitch = -80f;
+    private float minPitch = -30f;
     private float maxPitch = 60f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
-    private bool grappleUsed;
 
     Rigidbody rb;
     Vector3 moveDirection;
-    RaycastHit grappleHit;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-    }
-
-    void Start()
-    {
-        Cursor.visible = false;
-        grappleUsed = false;
     }
 
     // Non-Physics steps
@@ -48,20 +49,27 @@ public class CameraController : MonoBehaviour
 
         // set player speed, doesn't allow player to sprint backwards
         currentSpeed = walkSpeed;
-        if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
+        if(Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
         }
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if(Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
         }
 
-        // get back cursor
-        // FIXME: later on, get a way to remove the cursor again
-        if (Input.GetKey(KeyCode.Escape))
+        // jumping
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            Cursor.visible = true;
+            Jump ();
+        }
+        if (gameObject.transform.position.y < OOBHeight)
+        {
+            Player.transform.position = respawnPoint.position;
+        }
+        if (collectCount == 4)
+        {
+            gameCanvas.SetActive(true);
         }
     }
 
@@ -69,34 +77,6 @@ public class CameraController : MonoBehaviour
     {
         // Physics steps
         Move();
-
-        // jumping
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Jump();
-        }
-
-        // shoot grapple
-        if (Input.GetMouseButtonDown(1))
-        {
-            Grapple();
-        }
-    }
-
-    // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
-    void OnCollisionEnter (Collision col)
-    {
-        // resets jumpCount
-        if(col.gameObject.tag == "Ground")
-        {
-            currentJumpCount = maxJumpCount;
-        }
-
-        // // reset posiiton to original position - a "teleport" to the starting position
-        // if (col.gameObject.name == "Reset")
-        // {
-        //     transform.position = new Vector3(0, 1, 0);
-        // }
     }
 
     void CameraRotate()
@@ -117,22 +97,6 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    void Grapple()
-    {
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out grappleHit, grappleLength))
-        {
-            // check for anchor status
-            if (grappleHit.collider.tag == "Anchor" && !grappleUsed)
-            {
-                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * grappleHit.distance, Color.yellow);
-                // send player towards point
-                // transform.Translate(Vector3.forward * Time.deltaTime * grappleSpeed);
-                transform.position = Vector3.Lerp(transform.position, grappleHit.transform.position , grappleSpeed * Time.deltaTime);
-                grappleUsed = true;
-            }
-        }
-    }
-
     void Move()
     {
         // to fix falling slowly
@@ -141,5 +105,29 @@ public class CameraController : MonoBehaviour
         rb.velocity = moveDirection * currentSpeed * Time.deltaTime;
         // adding fixed fall velocity
         rb.velocity += yVelFix;
+    }
+
+    // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
+    void OnCollisionEnter (Collision col)
+    {
+        // resets jumpCount
+        if(col.gameObject.tag == "Ground")
+        {
+            currentJumpCount = maxJumpCount;
+        }
+        if (col.gameObject.tag == "Pick Up")
+        {
+            collectCount++;
+        }
+        // if (col.gameObject.name == "SawBlade")
+        // {
+        //     transform.position = new Vector3(0, 51, -47.5f);
+        // }
+
+        // // reset posiiton to original position - a "teleport" to the starting position
+        // if (col.gameObject.name == "Reset")
+        // {
+        //     transform.position = new Vector3(0, 1, 0);
+        // }
     }
 }
