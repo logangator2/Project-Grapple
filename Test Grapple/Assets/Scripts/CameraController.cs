@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 
 // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
 // FPS camera movement from: https://answers.unity.com/questions/1087351/limit-vertical-rotation-of-camera.html
@@ -14,12 +13,8 @@ public class CameraController : MonoBehaviour
     public float sprintSpeed;
     public float jumpForce;
     public float maxJumpCount;
-    public float OOBHeight = 0f;
     public Transform Player;
-    public Transform respawnPoint;
-    public GameObject gameCanvas;
 
-    private int collectCount = 0;
     private float yaw = 0f;
     private float pitch = 0f;
     private float minPitch = -30f;
@@ -62,14 +57,6 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump ();
-        }
-        if (gameObject.transform.position.y < OOBHeight)
-        {
-            Player.transform.position = respawnPoint.position;
-        }
-        if (collectCount == 4)
-        {
-            gameCanvas.SetActive(true);
         }
     }
 
@@ -115,14 +102,6 @@ public class CameraController : MonoBehaviour
         {
             currentJumpCount = maxJumpCount;
         }
-        if (col.gameObject.tag == "Pick Up")
-        {
-            collectCount++;
-        }
-        // if (col.gameObject.name == "SawBlade")
-        // {
-        //     transform.position = new Vector3(0, 51, -47.5f);
-        // }
 
         // // reset posiiton to original position - a "teleport" to the starting position
         // if (col.gameObject.name == "Reset")
