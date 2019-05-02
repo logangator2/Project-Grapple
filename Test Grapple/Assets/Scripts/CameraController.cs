@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
     public float SpeedH = 10f;
     public float SpeedV = 10f;
     public float OOBHeight = 0f;
-    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed;
+    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
     public Transform Player, respawnPoint;
     public GameObject gameCanvas;
 
@@ -95,6 +95,7 @@ public class CameraController : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             Grapple();
+            StartCoroutine("GrappleDelay");
         }
     }
 
@@ -109,6 +110,7 @@ public class CameraController : MonoBehaviour
         // FIXME: collects pickups
         if (col.gameObject.tag == "Pick Up")
         {
+            col.gameObject.SetActive (false);
             collectCount++;
         }
 
@@ -160,5 +162,11 @@ public class CameraController : MonoBehaviour
                 grappleUsed = true;
             }
         }
+    }
+
+    IEnumerator GrappleDelay()
+    {
+        yield return new WaitForSeconds(grappleDelayTime);
+        grappleUsed = false;
     }
 }
