@@ -12,10 +12,14 @@ public class CameraController : MonoBehaviour
     public float SpeedV = 10f;
     public float OOBHeight = 0f;
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
+    public float gameTime = 0f;
     public Transform Player, respawnPoint;
-    public GameObject gameCanvas;
     public Text reticle;
     public Text winText;
+    public Text stopwatch;
+
+    private int minutes, seconds;
+    private float ms;
 
     private int collectCount = 0;
     private float yaw = 0f;
@@ -24,6 +28,7 @@ public class CameraController : MonoBehaviour
     private float maxPitch = 60f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
     private bool grappleUsed;
+    private bool timeStop = false;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -55,11 +60,11 @@ public class CameraController : MonoBehaviour
 
         // set player speed, doesn't allow player to sprint backwards
         currentSpeed = walkSpeed;
-        if(Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
+        if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
         }
-        if(Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
         }
@@ -74,9 +79,18 @@ public class CameraController : MonoBehaviour
         // FIXME: collectible stuff
         if (collectCount == 4)
         {
+            timeStop = true;
+            stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
+            stopwatch.color = new Color(0f, 0.75f, 0f, 1f);
             reticle.gameObject.SetActive(false);
             winText.gameObject.SetActive(true);
         }
+        if (timeStop == false)
+        {
+            formatTime();
+            stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
+        }
+        
     }
 
     void FixedUpdate()
@@ -87,7 +101,7 @@ public class CameraController : MonoBehaviour
         // jumping
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Jump ();
+            Jump();
         }
         if (gameObject.transform.position.y < OOBHeight)
         {
@@ -103,10 +117,10 @@ public class CameraController : MonoBehaviour
     }
 
     // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
-    void OnCollisionEnter (Collision col)
+    void OnCollisionEnter(Collision col)
     {
         // resets jumpCount
-        if(col.gameObject.tag == "Ground")
+        if (col.gameObject.tag == "Ground")
         {
             currentJumpCount = maxJumpCount;
         }
@@ -146,10 +160,10 @@ public class CameraController : MonoBehaviour
 
     void Jump()
     {
-        if (currentJumpCount != 0) 
+        if (currentJumpCount != 0)
         {
             // from https://www.noob-programmer.com/unity3d/how-to-make-player-object-jump-in-unity-3d/
-            rb.AddForce(new Vector3 (0, jumpForce, 0), ForceMode.Impulse);
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
             currentJumpCount -= 1;
         }
     }
@@ -164,10 +178,18 @@ public class CameraController : MonoBehaviour
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * grappleHit.distance, Color.yellow);
                 // send player towards point
                 // transform.Translate(Vector3.forward * Time.deltaTime * grappleSpeed);
-                transform.position = Vector3.Lerp(transform.position, grappleHit.transform.position , grappleSpeed * Time.deltaTime);
+                transform.position = Vector3.Lerp(transform.position, grappleHit.transform.position, grappleSpeed * Time.deltaTime);
                 grappleUsed = true;
             }
         }
+    }
+
+    void formatTime()
+    {
+        int currentTime = (int)Time.time;
+        minutes = currentTime / 60;
+        seconds = currentTime % 60;
+        ms = (Time.time * 1000) % 1000;
     }
 
     IEnumerator GrappleDelay()
