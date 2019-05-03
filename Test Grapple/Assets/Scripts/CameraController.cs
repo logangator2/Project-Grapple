@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
     public Transform Player, respawnPoint;
     public GameObject gameCanvas;
+    public Text reticle;
+    public Text winText;
 
     private int collectCount = 0;
     private float yaw = 0f;
@@ -72,7 +74,8 @@ public class CameraController : MonoBehaviour
         // FIXME: collectible stuff
         if (collectCount == 4)
         {
-            gameCanvas.SetActive(true);
+            reticle.gameObject.SetActive(false);
+            winText.gameObject.SetActive(true);
         }
     }
 
@@ -107,17 +110,20 @@ public class CameraController : MonoBehaviour
         {
             currentJumpCount = maxJumpCount;
         }
-        // FIXME: collects pickups
-        if (col.gameObject.tag == "Pick Up")
-        {
-            col.gameObject.SetActive (false);
-            collectCount++;
-        }
 
         // if (col.gameObject.name == "SawBlade")
         // {
         //     transform.position = new Vector3(0, 51, -47.5f);
         // }
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.CompareTag("Pick Up"))
+        {
+            col.gameObject.SetActive(false);
+            collectCount++;
+        }
     }
 
     void CameraRotate()
