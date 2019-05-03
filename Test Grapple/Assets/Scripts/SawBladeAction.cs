@@ -5,13 +5,13 @@ using UnityEngine;
 public class SawBladeAction : MonoBehaviour
 {
     public int LevelFloor = 0;
-    public float timeToDestroy = 3.0f;
+    public float timeToDestroy = 6.0f;
     public Vector3 respawnPoint;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        Destroy(gameObject, timeToDestroy);
     }
 
     // Update is called once per frame
@@ -21,7 +21,6 @@ public class SawBladeAction : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        Destroy(gameObject, timeToDestroy);
     }
 
     void OnCollisionEnter(Collision col)

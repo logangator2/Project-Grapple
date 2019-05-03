@@ -34,3 +34,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+Test Grapple/ProjectSettings/ProjectVersion\.txt
