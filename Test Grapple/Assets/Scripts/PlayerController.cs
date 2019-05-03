@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked ;
         currentSpeed = walkSpeed;
     }
 
@@ -106,6 +107,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.Escape))
         {
             Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
 
         // FIXME: collectible stuff
