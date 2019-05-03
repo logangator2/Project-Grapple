@@ -12,14 +12,17 @@ public class PlayerController : MonoBehaviour
     public float SpeedV = 10f;
     public float OOBHeight = 0f;
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
+    public float stepRate = 0.5f;
+
     public Transform Player, respawnPoint;
     public GameObject gameCanvas;
     public Text reticle;
     public Text winText;
+    public bool latchOn = true;
 
     [SerializeField] private float att_rate = .5f;
-    [SerializeField] private AudioClip swing, ding, hit, step;
-    [SerializeField] private GameObject hitParticlePrefab;
+    [SerializeField] private AudioClip swing, ding, hit, step, thunk;
+    //[SerializeField] private GameObject hitParticlePrefab;
 
     private AudioSource aud;
     private Camera cam;
@@ -29,9 +32,11 @@ public class PlayerController : MonoBehaviour
     private float minPitch = -80f;
     private float maxPitch = 80f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
-    private bool grappleUsed;
-    private bool grappling;
+    private bool grappleUsed = false;
+    private bool grappling = false;
     private Vector3 target;
+    private bool canStep = true;
+    private bool grounded = true;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -47,7 +52,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        grappleUsed = false;
         currentSpeed = walkSpeed;
     }
 
@@ -61,11 +65,16 @@ public class PlayerController : MonoBehaviour
         verticalMovement = Input.GetAxisRaw("Vertical");
         moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
 
-        if(Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
+        if (grounded && canStep && horizontalMovement + verticalMovement != 0)
+        {
+            StartCoroutine(StepDelay());
+        } 
+
+        if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
         }
-        if(Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
         }
@@ -76,10 +85,14 @@ public class PlayerController : MonoBehaviour
                 attack();
             }
         }
-        if (Input.GetMouseButtonUp(1))
+
+        if (Input.GetMouseButtonDown(1))
         {
-            grappling = false;
-            GrappleDelay();
+            target = LaunchGrapple();
+        }
+        if (Input.GetMouseButtonUp(1) && grappling)
+        {
+            StartCoroutine(GrappleDelay());
         }
 
         // get back cursor
@@ -95,6 +108,12 @@ public class PlayerController : MonoBehaviour
             reticle.gameObject.SetActive(false);
             winText.gameObject.SetActive(true);
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
+        }
+
     }
 
     void FixedUpdate()
@@ -103,10 +122,6 @@ public class PlayerController : MonoBehaviour
         Move();
 
         // jumping
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Jump ();
-        }
         if (gameObject.transform.position.y < OOBHeight)
         {
             gameObject.transform.position = respawnPoint.position;
@@ -118,44 +133,44 @@ public class PlayerController : MonoBehaviour
             if (grappling)
             {
                 ReelGrapple(target);
-            } else if (!grappleUsed)
-            {
-                target = LaunchGrapple();
             }
         }
-        if (Input.GetMouseButton(1))
-        {
-            StartCoroutine("GrappleDelay");
-        }
-    }
-
-    // partially from https://unity3d.com/learn/tutorials/topics/physics/detecting-collisions-oncollisionenter
-    void OnCollisionEnter (Collision col)
-    {
-        // resets jumpCount
-        if(col.gameObject.tag == "Ground")
-        {
-            currentJumpCount = maxJumpCount;
-        }
-
-        grappleUsed = true;
-        grappling = false;
-        GrappleDelay();
-
-        // if (col.gameObject.name == "SawBlade")
-        // {
-        //     transform.position = new Vector3(0, 51, -47.5f);
-        // }
     }
 
     void OnTriggerEnter(Collider col)
     {
+        if (col.gameObject.tag == "Anchor")
+        {
+            aud.PlayOneShot(thunk, 0.2f);
+            if (!latchOn)
+            {
+                grappling = false;
+                StartCoroutine(GrappleDelay());
+            }
+        }
+
+        if (col.gameObject.tag == "Ground")
+        {
+            grounded = true;
+            currentJumpCount = maxJumpCount;
+        }
+
         if (col.gameObject.CompareTag("Pick Up"))
         {
             col.gameObject.SetActive(false);
+            aud.PlayOneShot(ding, 0.3f);
             collectCount++;
         }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Ground")
+        {
+            grounded = false;
+        }
+    }
+
 
     void CameraRotate()
     {
@@ -178,10 +193,10 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        if (currentJumpCount != 0) 
+        if (currentJumpCount != 0)
         {
             // from https://www.noob-programmer.com/unity3d/how-to-make-player-object-jump-in-unity-3d/
-            rb.AddForce(new Vector3 (0, jumpForce, 0), ForceMode.Impulse);
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
             currentJumpCount -= 1;
         }
     }
@@ -199,7 +214,6 @@ public class PlayerController : MonoBehaviour
         {
             if (hitspot.point != null && hitspot.collider.tag == "Anchor")
             {
-                Debug.Log(hitspot.point);
                 //Lower the ice pick
                 //Fire out the grapple
                 grappling = true;
@@ -218,11 +232,11 @@ public class PlayerController : MonoBehaviour
             RaycastHit hitspot;
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
 
-            if(Physics.Raycast(ray, out hitspot))
+            if (Physics.Raycast(ray, out hitspot))
             {
                 if (hitspot.point != null)
                 {
-                    Instantiate(hitParticlePrefab, hitspot.point, Quaternion.LookRotation(hitspot.normal)); // Spawn particles
+                    //Instantiate(hitParticlePrefab, hitspot.point, Quaternion.LookRotation(hitspot.normal)); // Spawn particles
                     aud.PlayOneShot(hit, 0.5F);
                 }
                 else
@@ -236,7 +250,25 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator GrappleDelay()
     {
+        grappling = false;
+        grappleUsed = true;
         yield return new WaitForSeconds(grappleDelayTime);
         grappleUsed = false;
+    }
+
+    IEnumerator StepDelay()
+    {
+        aud.PlayOneShot(step, 0.1f);
+        canStep = false;
+        
+        if(currentSpeed == sprintSpeed)
+        {
+            yield return new WaitForSeconds(stepRate / 1.5f);
+        } else
+        {
+            yield return new WaitForSeconds(stepRate);
+        }
+
+        canStep = true;
     }
 }
