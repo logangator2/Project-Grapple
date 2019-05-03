@@ -14,6 +14,12 @@ public class PlayerController : MonoBehaviour
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
     public float stepRate = 0.5f;
 
+    public Text stopwatch;
+
+    private int minutes, seconds;
+    private float ms;
+    private bool timeStop = false;
+
     public Transform Player, respawnPoint;
     public GameObject gameCanvas;
     public Text reticle;
@@ -105,8 +111,17 @@ public class PlayerController : MonoBehaviour
         // FIXME: collectible stuff
         if (collectCount == 4)
         {
+            timeStop = true;
+            stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
+            stopwatch.color = new Color(0f, 0.75f, 0f, 1f);
             reticle.gameObject.SetActive(false);
             winText.gameObject.SetActive(true);
+        }
+
+        if (timeStop == false)
+        {
+            formatTime();
+            stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -199,6 +214,14 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
             currentJumpCount -= 1;
         }
+    }
+
+    void formatTime()
+    {
+        int currentTime = (int)Time.time;
+        minutes = currentTime / 60;
+        seconds = currentTime % 60;
+        ms = (Time.time * 1000) % 1000;
     }
 
     void ReelGrapple(Vector3 targetDir)
