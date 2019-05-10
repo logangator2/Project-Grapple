@@ -11,10 +11,10 @@ public class PlayerController : MonoBehaviour
     public float SpeedH = 10f;
     public float SpeedV = 10f;
     public float OOBHeight = 0f;
-    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
     public float stepRate = 0.5f;
-
-    public Text stopwatch;
+    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
+    
+    public bool latchOn = true;
 
     private int minutes, seconds;
     private float ms;
@@ -22,9 +22,7 @@ public class PlayerController : MonoBehaviour
 
     public Transform Player, respawnPoint;
     public GameObject gameCanvas;
-    public Text reticle;
-    public Text winText;
-    public bool latchOn = true;
+    public Text reticle, winText, stopwatch;
 
     [SerializeField] private float att_rate = .5f;
     [SerializeField] private AudioClip swing, ding, hit, step, thunk;
@@ -58,7 +56,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked ;
+        Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = walkSpeed;
     }
 
