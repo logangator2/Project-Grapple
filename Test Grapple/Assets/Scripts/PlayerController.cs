@@ -75,6 +75,7 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(StepDelay());
         } 
 
+        // sprinting
         if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
@@ -83,6 +84,8 @@ public class PlayerController : MonoBehaviour
         {
             currentSpeed = walkSpeed;
         }
+
+        // attack
         if (Input.GetMouseButtonDown(0))
         {
             if (!grappling)
@@ -91,6 +94,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // grapple
         if (Input.GetMouseButtonDown(1))
         {
             target = LaunchGrapple();
