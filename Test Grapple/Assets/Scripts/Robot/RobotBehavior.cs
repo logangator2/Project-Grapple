@@ -10,8 +10,7 @@ public class RobotBehavior : MonoBehaviour
         Idle = 0,
         Patrolling = 1,
         Engaging = 2,
-        Cooldown = 3,
-        Searching = 4
+        Searching = 3
     }
 
     // public variables
@@ -42,7 +41,6 @@ public class RobotBehavior : MonoBehaviour
             // check behavior
             if (behaviorStatus == Behavior.Patrolling) {Patrol();}
             else if (behaviorStatus == Behavior.Engaging) {Engage();}
-            else if (behaviorStatus == Behavior.Cooldown) {Cool();}
             else if (behaviorStatus == Behavior.Searching) {Patrol();}
         }
         // else 
@@ -79,11 +77,6 @@ public class RobotBehavior : MonoBehaviour
     {
         // empty, to be defined in child classes
     }   
-
-    protected void Cool()
-    {
-
-    }
 
     protected void Search()
     {

@@ -23,7 +23,6 @@ public class SpiderBot : RobotBehavior
             // check behavior
             if (behaviorStatus == Behavior.Patrolling) {Patrol();}
             else if (behaviorStatus == Behavior.Engaging) {Engage();}
-            else if (behaviorStatus == Behavior.Cooldown) {Cool();}
             else if (behaviorStatus == Behavior.Searching) {Patrol();}
         }
     }
