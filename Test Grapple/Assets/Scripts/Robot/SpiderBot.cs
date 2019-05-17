@@ -5,9 +5,20 @@ using UnityEngine.AI;
 
 public class SpiderBot : RobotBehavior
 {
+    public float laserDuration;
+    public float laserDelay;
+    public Vector3 fudge;
+    public Vector3 laserOffset;
+
+
     public Vector3 engageBuffer;
     public GameObject Player;
     private LineRenderer laserLine;
+
+    void Start()
+    {
+        laserLine = GetComponent<LineRenderer>();
+    }
 
     void Update()
     {
@@ -45,7 +56,10 @@ public class SpiderBot : RobotBehavior
 
     new void Engage()
     {
+        // follow player
         agent.destination = Player.transform.position - engageBuffer;
+        // fire laser
+        StartCoroutine("Fire");
         if (Vector3.Distance(transform.position, agent.destination) <= 10)
         {
             agent.isStopped = true;
@@ -53,8 +67,13 @@ public class SpiderBot : RobotBehavior
         }
     }
 
-    void Fire()
+    IEnumerator Fire()
     {
-        
-    }
+        laserLine.SetPosition(0, transform.position + laserOffset);
+        laserLine.enabled = true;
+        laserLine.SetPosition(1, Player.transform.position + fudge); // FIXME: Needs fudge factor
+        yield return new WaitForSeconds(laserDuration);
+        laserLine.enabled = false;
+        yield return new WaitForSeconds(laserDelay);
+    }    
 }
