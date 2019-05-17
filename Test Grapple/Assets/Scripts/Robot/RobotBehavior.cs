@@ -15,15 +15,17 @@ public class RobotBehavior : MonoBehaviour
     }
 
     // public variables
+    public float alertDistance;
     public Behavior behaviorStatus;
     public Transform patrolpointA, patrolpointB;
     
     // private variables
-    private float patrolDistance = 2f;
+    protected float patrolDistance = 2f;
 
     // Unity variables
-    NavMeshAgent agent;
-    Rigidbody rb;
+    protected NavMeshAgent agent;
+    protected Rigidbody rb;
+    protected RaycastHit detected;
 
     // Unity Functions
 
@@ -51,9 +53,8 @@ public class RobotBehavior : MonoBehaviour
 
     // Custom Functions
 
-    void Patrol()
+    protected void Patrol()
     {
-        // behaviorStatus = Behavior.Patrolling;
         if (Vector3.Distance(rb.position, patrolpointA.position) <= patrolDistance)
         {
             agent.destination = patrolpointB.position;
@@ -62,20 +63,22 @@ public class RobotBehavior : MonoBehaviour
         {
             agent.destination = patrolpointA.position;
         }
+
+        // if player detected, engage
     }
 
-    void Engage()
+    protected void Engage()
     {
-        behaviorStatus = Behavior.Engaging;
+        // empty, to be defined in child classes
     }   
 
-    void Cool()
+    protected void Cool()
     {
-        behaviorStatus = Behavior.Cooldown;
+
     }
 
-    void Search()
+    protected void Search()
     {
-        behaviorStatus = Behavior.Searching;
+
     }
 }
