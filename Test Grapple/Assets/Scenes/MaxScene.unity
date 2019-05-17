@@ -127,7 +127,7 @@ PrefabInstance:
     - target: {fileID: 7833567349585227966, guid: ed46386b95351864689f41630027b5f1,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7833567349585227960, guid: ed46386b95351864689f41630027b5f1,
         type: 3}
@@ -249,7 +249,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!82 &196555478
 AudioSource:
   m_ObjectHideFlags: 0
@@ -400,11 +400,17 @@ MonoBehaviour:
   hit: {fileID: 8300000, guid: baa4dc1b2ef79dd4d8fdc9f8eb807a80, type: 3}
   step: {fileID: 8300000, guid: 5f4acef52030aaf41b7d6b41b79767e8, type: 3}
   thunk: {fileID: 8300000, guid: eca1868b665daf748b77af4b5560b0bd, type: 3}
+  aimSound: {fileID: 0}
   aimingHair: {fileID: 0}
   anchorHair: {fileID: 0}
+  vmCam: {fileID: 326762733}
+  grappleCharging: 0
   baseFov: 70
   sprintFov: 60
   grappleFov: 45
+  grappling: 0
+  grappleOrigin: {x: 0, y: 0, z: 0}
+  grappleTarget: {x: 0, y: 0, z: 0}
 --- !u!54 &196555482
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -841,7 +847,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &1053436792
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1016,7 +1022,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &1695326716
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1451,16 +1457,16 @@ PrefabInstance:
         type: 3}
       propertyPath: Player
       value: 
-      objectReference: {fileID: 1695326715}
+      objectReference: {fileID: 196555477}
     - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
       propertyPath: laserOffset.y
-      value: 1
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
       propertyPath: laserOffset.z
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 454a384ea097b46fba95f64b669d5f33, type: 3}

@@ -197,6 +197,12 @@ public class PlayerController : MonoBehaviour
             aud.PlayOneShot(thunk, 0.2f);
             grappling = false;
         }
+
+        // if (col.gameObject.name == "LineRenderer")
+        // {
+        //     // reset player to last spawn point
+        //     Debug.Log("Player hit by laser!");
+        // }
     }
 
     void OnTriggerEnter(Collider col)

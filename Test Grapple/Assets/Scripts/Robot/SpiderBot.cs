@@ -56,14 +56,14 @@ public class SpiderBot : RobotBehavior
 
     new void Engage()
     {
+        behaviorStatus = Behavior.Engaging;
         // follow player
         agent.destination = Player.transform.position - engageBuffer;
         // fire laser
-        StartCoroutine("Fire");
+        // StartCoroutine("Fire");
         if (Vector3.Distance(transform.position, agent.destination) <= 10)
         {
-            agent.isStopped = true;
-            rb.velocity = Vector3.zero;
+            agent.destination = Player.transform.position = engageBuffer;
         }
     }
 
@@ -71,7 +71,7 @@ public class SpiderBot : RobotBehavior
     {
         laserLine.SetPosition(0, transform.position + laserOffset);
         laserLine.enabled = true;
-        laserLine.SetPosition(1, Player.transform.position + fudge); // FIXME: Needs fudge factor
+        laserLine.SetPosition(1, Player.transform.position + fudge); // FIXME: Needs fudge factor + fudge
         yield return new WaitForSeconds(laserDuration);
         laserLine.enabled = false;
         yield return new WaitForSeconds(laserDelay);
