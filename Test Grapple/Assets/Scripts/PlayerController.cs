@@ -203,6 +203,11 @@ public class PlayerController : MonoBehaviour
         //     // reset player to last spawn point
         //     Debug.Log("Player hit by laser!");
         // }
+
+        if (col.gameObject.tag == "Respawn")
+        {
+            transform.position = new Vector3(69, 175, 81);
+        }
     }
 
     void OnTriggerEnter(Collider col)
