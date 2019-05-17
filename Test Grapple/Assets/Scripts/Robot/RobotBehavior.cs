@@ -51,6 +51,14 @@ public class RobotBehavior : MonoBehaviour
         // }
     }
 
+    private void OnCollisionEnter(Collision col)
+    {
+        if (col.gameObject.tag == "Nail")
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     // Custom Functions
 
     protected void Patrol()
