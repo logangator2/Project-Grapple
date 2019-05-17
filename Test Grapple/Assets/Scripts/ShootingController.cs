@@ -30,6 +30,7 @@ public class ShootingController : MonoBehaviour
         auds = GetComponent<AudioSource>();
         pc = GetComponent<PlayerController>();
         muzzle = MuzzleFlash.GetComponent<ParticleSystem>();
+
         GunStartPos = Gun.transform.localPosition.z;
         GrappleStartPos = Grapple.transform.localPosition.z;
         GrappleChargePos = Grapple.transform.localPosition.z + .7f;

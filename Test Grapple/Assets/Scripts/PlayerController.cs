@@ -71,7 +71,6 @@ public class PlayerController : MonoBehaviour
         verticalMovement = Input.GetAxisRaw("Vertical");
         moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
 
-        // step audio
         if (grounded && canStep && horizontalMovement + verticalMovement != 0)
         {
             StartCoroutine(StepDelay());
@@ -87,23 +86,18 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // sprinting
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
         }
 
-        // grappling
-        
         if (Input.GetMouseButton(1))
         {
             if (grappleCharging)
             {
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, grappleFov, FOVDeceleration);
             }
-        }
-        else if (currentSpeed != sprintSpeed)
-        {
+        } else if (currentSpeed != sprintSpeed) {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, baseFov, FOVDeceleration * 1.5f);
         }
 
@@ -151,19 +145,17 @@ public class PlayerController : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
 
-        // jumping
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump();
         }
 
-        // 
         vmCam.fieldOfView = cam.fieldOfView - 5;
     }
 
     void FixedUpdate()
     {
-        // Physics steps shoudl be in FixedUpdate
         if (moveDirection != new Vector3(0, 0, 0) && rb.velocity.y == 0)
         {
             rb.velocity = new Vector3(0, 0, 0);
@@ -186,6 +178,8 @@ public class PlayerController : MonoBehaviour
                 anchorHair.gameObject.SetActive(false);
             }
         }
+
+        // Physics steps
 
         if(upForce > 0)
         {
@@ -210,7 +204,6 @@ public class PlayerController : MonoBehaviour
         //     Debug.Log("Player hit by laser!");
         // }
 
-        // FIXME: 
         if (col.gameObject.tag == "Respawn")
         {
             transform.position = new Vector3(69, 175, 81);
@@ -219,7 +212,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        // Collision interactions
+
         if (col.gameObject.tag == "Ground")
         {
             grounded = true;
@@ -278,7 +271,6 @@ public class PlayerController : MonoBehaviour
         }
         return false;
     }
-    
     Vector3 LaunchGrapple()
     {
         RaycastHit hitspot;
