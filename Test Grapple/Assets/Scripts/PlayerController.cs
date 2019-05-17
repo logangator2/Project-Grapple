@@ -10,37 +10,38 @@ public class PlayerController : MonoBehaviour
 
     public float SpeedH = 10f;
     public float SpeedV = 10f;
-    public float OOBHeight = 0f;
     public float stepRate = 0.5f;
+    public float residualGrappleForce = 30f;
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
-    
-    public bool latchOn = true;
-
-    private int minutes, seconds;
-    private float ms;
-    private bool timeStop = false;
-
-    public Transform Player, respawnPoint;
-    public GameObject gameCanvas;
-    public Text reticle, winText, stopwatch;
 
     [SerializeField] private float att_rate = .5f;
     [SerializeField] private AudioClip swing, ding, hit, step, thunk;
-    //[SerializeField] private GameObject hitParticlePrefab;
+    [SerializeField] private Image aimingHair, anchorHair;
 
     private AudioSource aud;
     private Camera cam;
+
     private int collectCount = 0;
+    private float upForce = 0f;
+
     private float yaw = 0f;
     private float pitch = 0f;
-    private float minPitch = -80f;
-    private float maxPitch = 80f;
+    private float minPitch = -89.9f;
+    private float maxPitch = 89.9f;
+    private float FOVDeceleration = 0.2f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
     private bool grappleUsed = false;
     private bool grappling = false;
-    private Vector3 target;
+    private bool grappleCharging = false;
     private bool canStep = true;
     private bool grounded = true;
+    
+    public float baseFov = 70f;
+    public float sprintFov = 60f;
+    public float grappleFov = 45f;
+
+    private Vector3 grappleOrigin;
+    private Vector3 grappleTarget;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -60,11 +61,9 @@ public class PlayerController : MonoBehaviour
         currentSpeed = walkSpeed;
     }
 
-    // Non-Physics steps
     void Update()
     {
         CameraRotate();
-
         // compute movement direction
         horizontalMovement = Input.GetAxisRaw("Horizontal");
         verticalMovement = Input.GetAxisRaw("Vertical");
@@ -73,13 +72,18 @@ public class PlayerController : MonoBehaviour
         if (grounded && canStep && horizontalMovement + verticalMovement != 0)
         {
             StartCoroutine(StepDelay());
-        } 
+        }
 
         // sprinting
         if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
             currentSpeed = sprintSpeed;
-        }
+            if (!grappleCharging)
+            {
+                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, sprintFov, FOVDeceleration);
+            }
+        } 
+
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
@@ -88,20 +92,55 @@ public class PlayerController : MonoBehaviour
         // attack
         if (Input.GetMouseButtonDown(0))
         {
-            if (!grappling)
+            if (!grappling && !grappleCharging)
             {
-                attack();
+                // PEW PEW
             }
         }
 
-        // grapple
+        if (Input.GetMouseButton(1))
+        {
+            if (grappleCharging)
+            {
+                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, grappleFov, FOVDeceleration);
+            }
+        } else if (currentSpeed != sprintSpeed){
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, baseFov, FOVDeceleration * 1.5f);
+        }
+
         if (Input.GetMouseButtonDown(1))
         {
-            target = LaunchGrapple();
+            if (grappling)
+            {
+                Vector3 kickButt = grappleTarget - grappleOrigin;
+                if(kickButt.y < 0)
+                {
+                    kickButt.y *= -1;
+                }
+                rb.AddForce(kickButt * residualGrappleForce);
+                Debug.Log(kickButt);
+                grappling = false;
+            } else {
+                grappleCharging = true;
+                aimingHair.gameObject.SetActive(true);
+            }
         }
-        if (Input.GetMouseButtonUp(1) && grappling)
+
+        if (Input.GetMouseButtonUp(1) && grappleCharging)
         {
-            StartCoroutine(GrappleDelay());
+            aimingHair.gameObject.SetActive(false);
+            anchorHair.gameObject.SetActive(false);
+            grappleCharging = false;
+
+            if (aimedAtAnchor())
+            {
+                grappleTarget = LaunchGrapple();
+                grappleOrigin = rb.position;
+                grappling = true;
+            } else
+            {
+                // play whiff sound effect
+            }
         }
 
         // get back cursor
@@ -112,61 +151,60 @@ public class PlayerController : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
 
-        // FIXME: collectible stuff
-        if (collectCount == 4)
-        {
-            timeStop = true;
-            stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
-            stopwatch.color = new Color(0f, 0.75f, 0f, 1f);
-            reticle.gameObject.SetActive(false);
-            winText.gameObject.SetActive(true);
-        }
-
-        if (timeStop == false)
-        {
-            formatTime();
-            stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
-        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump();
         }
-
     }
 
     void FixedUpdate()
     {
-        // Physics steps
-        Move();
-
-        // jumping
-        if (gameObject.transform.position.y < OOBHeight)
+        if (moveDirection != new Vector3(0, 0, 0) && rb.velocity.y == 0)
         {
-            gameObject.transform.position = respawnPoint.position;
+            rb.velocity = new Vector3(0, 0, 0);
         }
 
-        // shoot grapple
-        if (Input.GetMouseButton(1))
+        Move();
+
+        if (grappling)
         {
-            if (grappling)
+            transform.position = Vector3.MoveTowards(transform.position, grappleTarget, grappleSpeed);
+        }
+
+        if (Input.GetMouseButton(1) && grappleCharging)
+        {
+            if (aimedAtAnchor())
             {
-                ReelGrapple(target);
+                anchorHair.gameObject.SetActive(true);
+            } else
+            {
+                anchorHair.gameObject.SetActive(false);
             }
+        }
+
+        // Physics steps
+
+        if(upForce > 0)
+        {
+            rb.AddForce(new Vector3(0, upForce, 0));
+            upForce -= Time.deltaTime * 30f;
+        }
+
+    }
+
+    private void OnCollisionEnter(Collision col)
+    {
+        if ((col.gameObject.tag == "Anchor" || col.gameObject.tag == "Ground") && grappling)
+        {
+            upForce = residualGrappleForce;
+            aud.PlayOneShot(thunk, 0.2f);
+            grappling = false;
         }
     }
 
     void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "Anchor")
-        {
-            aud.PlayOneShot(thunk, 0.2f);
-            if (!latchOn)
-            {
-                grappling = false;
-                StartCoroutine(GrappleDelay());
-            }
-        }
 
         if (col.gameObject.tag == "Ground")
         {
@@ -190,7 +228,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     void CameraRotate()
     {
         yaw += Input.GetAxis("Mouse X") * SpeedH;
@@ -202,12 +239,7 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        // to fix falling slowly
-        Vector3 yVelFix = new Vector3(0, rb.velocity.y, 0);
-        // to move normally
-        rb.velocity = moveDirection * currentSpeed * Time.deltaTime;
-        // adding fixed fall velocity
-        rb.velocity += yVelFix;
+        rb.MovePosition(transform.position + moveDirection * currentSpeed * Time.deltaTime);
     }
 
     void Jump()
@@ -219,20 +251,19 @@ public class PlayerController : MonoBehaviour
             currentJumpCount -= 1;
         }
     }
-
-    void formatTime()
+    bool aimedAtAnchor()
     {
-        int currentTime = (int)Time.time;
-        minutes = currentTime / 60;
-        seconds = currentTime % 60;
-        ms = (Time.time * 1000) % 1000;
+        RaycastHit hitspot;
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
+        if (Physics.Raycast(ray, out hitspot))
+        {
+            if (hitspot.point != null && hitspot.collider.tag == "Anchor")
+            {
+                return true;
+            }
+        }
+        return false;
     }
-
-    void ReelGrapple(Vector3 targetDir)
-    {
-        transform.position = Vector3.MoveTowards(transform.position, targetDir, grappleSpeed);
-    }
-
     Vector3 LaunchGrapple()
     {
         RaycastHit hitspot;
@@ -241,46 +272,11 @@ public class PlayerController : MonoBehaviour
         {
             if (hitspot.point != null && hitspot.collider.tag == "Anchor")
             {
-                //Lower the ice pick
-                //Fire out the grapple
-                grappling = true;
                 aud.PlayOneShot(hit, 0.5F);
                 return hitspot.point;
             }
         }
         return hitspot.point;
-    }
-
-    IEnumerator attack()
-    {
-        while (Input.GetMouseButton(0))
-        {
-            // Play Animation
-            RaycastHit hitspot;
-            Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-
-            if (Physics.Raycast(ray, out hitspot))
-            {
-                if (hitspot.point != null)
-                {
-                    //Instantiate(hitParticlePrefab, hitspot.point, Quaternion.LookRotation(hitspot.normal)); // Spawn particles
-                    aud.PlayOneShot(hit, 0.5F);
-                }
-                else
-                {
-                    aud.PlayOneShot(swing, 0.5F);
-                }
-            }
-            yield return new WaitForSeconds(att_rate);
-        }
-    }
-
-    IEnumerator GrappleDelay()
-    {
-        grappling = false;
-        grappleUsed = true;
-        yield return new WaitForSeconds(grappleDelayTime);
-        grappleUsed = false;
     }
 
     IEnumerator StepDelay()
