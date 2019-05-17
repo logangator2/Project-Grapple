@@ -15,8 +15,9 @@ public class PlayerController : MonoBehaviour
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
 
     [SerializeField] private float att_rate = .5f;
-    [SerializeField] private AudioClip swing, ding, hit, step, thunk;
+    [SerializeField] private AudioClip swing, ding, hit, step, thunk, aimSound;
     [SerializeField] private Image aimingHair, anchorHair;
+    [SerializeField] private Camera vmCam;
 
     private AudioSource aud;
     private Camera cam;
@@ -30,9 +31,7 @@ public class PlayerController : MonoBehaviour
     private float maxPitch = 89.9f;
     private float FOVDeceleration = 0.2f;
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
-    private bool grappleUsed = false;
-    private bool grappling = false;
-    private bool grappleCharging = false;
+    public bool grappleCharging = false;
     private bool canStep = true;
     private bool grounded = true;
     
@@ -40,8 +39,9 @@ public class PlayerController : MonoBehaviour
     public float sprintFov = 60f;
     public float grappleFov = 45f;
 
-    private Vector3 grappleOrigin;
-    private Vector3 grappleTarget;
+    public bool grappling = false;
+    public Vector3 grappleOrigin;
+    public Vector3 grappleTarget;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         cam = GetComponentInChildren<Camera>();
+        //vmcam = GetComponentInChildren<Camera>();
+
         rb = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
     }
@@ -82,20 +84,11 @@ public class PlayerController : MonoBehaviour
             {
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, sprintFov, FOVDeceleration);
             }
-        } 
+        }
 
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             currentSpeed = walkSpeed;
-        }
-
-        // attack
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (!grappling && !grappleCharging)
-            {
-                // PEW PEW
-            }
         }
 
         if (Input.GetMouseButton(1))
@@ -104,7 +97,7 @@ public class PlayerController : MonoBehaviour
             {
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, grappleFov, FOVDeceleration);
             }
-        } else if (currentSpeed != sprintSpeed){
+        } else if (currentSpeed != sprintSpeed) {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, baseFov, FOVDeceleration * 1.5f);
         }
 
@@ -113,7 +106,7 @@ public class PlayerController : MonoBehaviour
             if (grappling)
             {
                 Vector3 kickButt = grappleTarget - grappleOrigin;
-                if(kickButt.y < 0)
+                if (kickButt.y < 0)
                 {
                     kickButt.y *= -1;
                 }
@@ -121,6 +114,7 @@ public class PlayerController : MonoBehaviour
                 Debug.Log(kickButt);
                 grappling = false;
             } else {
+                aud.PlayOneShot(aimSound, 1.3f);
                 grappleCharging = true;
                 aimingHair.gameObject.SetActive(true);
             }
@@ -156,6 +150,8 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
+
+        vmCam.fieldOfView = cam.fieldOfView - 5;
     }
 
     void FixedUpdate()

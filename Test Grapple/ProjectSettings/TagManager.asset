@@ -8,6 +8,7 @@ TagManager:
   - Pick Up
   - Anchor
   - Crosshair
+  - Nail
   layers:
   - Default
   - TransparentFX
