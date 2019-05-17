@@ -14,22 +14,9 @@ public class PlayerController : MonoBehaviour
     public float residualGrappleForce = 30f;
     public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
 
-    //TODO : Move to GameController Object
-    /*
-    private int minutes, seconds;
-    private float ms;
-    private bool timeStop = false;
-
-    public Transform Player, respawnPoint;
-    public GameObject gameCanvas;
-    public Text reticle, winText, stopwatch; 
-    */
-
     [SerializeField] private float att_rate = .5f;
     [SerializeField] private AudioClip swing, ding, hit, step, thunk;
     [SerializeField] private Image aimingHair, anchorHair;
-
-    //[SerializeField] private GameObject hitParticlePrefab;
 
     private AudioSource aud;
     private Camera cam;
@@ -107,7 +94,7 @@ public class PlayerController : MonoBehaviour
         {
             if (!grappling && !grappleCharging)
             {
-                attack();
+                // PEW PEW
             }
         }
 
@@ -291,69 +278,6 @@ public class PlayerController : MonoBehaviour
         }
         return hitspot.point;
     }
-
-    IEnumerator attack()
-    {
-        while (Input.GetMouseButton(0))
-        {
-            // Play Animation
-            RaycastHit hitspot;
-            Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-
-            if (Physics.Raycast(ray, out hitspot))
-            {
-                if (hitspot.point != null)
-                {
-                    //Instantiate(hitParticlePrefab, hitspot.point, Quaternion.LookRotation(hitspot.normal)); // Spawn particles
-                    aud.PlayOneShot(hit, 0.5F);
-                }
-                else
-                {
-                    aud.PlayOneShot(swing, 0.5F);
-                }
-            }
-            yield return new WaitForSeconds(att_rate);
-        }
-    }
-
-    /* Delete?
-    IEnumerator GrappleDelay()
-    {
-        grappling = false;
-        grappleUsed = true;
-        yield return new WaitForSeconds(grappleDelayTime);
-        grappleUsed = false;
-    }
-    */
-
-    //TODO : Move to GameController Object
-    /*
-    void formatTime()
-    {
-        int currentTime = (int)Time.time;
-        minutes = currentTime / 60;
-        seconds = currentTime % 60;
-        ms = (Time.time * 1000) % 1000;
-    }
-    */
-    // TODO: Move this stuff to a GameController object on a per-scene basis.
-    /*
-    if (collectCount == 4)
-    {
-        timeStop = true;
-         .text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
-        stopwatch.color = new Color(0f, 0.75f, 0f, 1f);
-        reticle.gameObject.SetActive(false);
-        winText.gameObject.SetActive(true);
-    }
-
-    if (timeStop == false)
-    {
-        formatTime();
-        stopwatch.text = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, ms);
-    }
-    */
-
 
     IEnumerator StepDelay()
     {
