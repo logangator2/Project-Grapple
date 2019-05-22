@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class SpiderBot : RobotBehavior
 {
     public float laserDuration, laserDelay, laserDistance, engageDistance;
-    public Vector3 fudge, laserOffset, engageBuffer;
+    public Vector3 laserOffset, engageBuffer;
     public GameObject Player;
 
     private LineRenderer laserLine;
@@ -63,12 +63,6 @@ public class SpiderBot : RobotBehavior
         {
             agent.destination = Player.transform.position - engageBuffer;
         }
-        // reset robot if player has left
-        if (Vector3.Distance(transform.position, agent.destination) >= engageDistance)
-        {
-            // behaviorStatus = originalBehavior;
-        }
-        // FIXME: Add way for robot to exit "Engage"
     }
 
     IEnumerator Fire()
@@ -97,15 +91,11 @@ public class SpiderBot : RobotBehavior
                 }
                 else 
                 {
-
+                    // hits the wall
                     yield return new WaitForSeconds(laserDuration);
                     laserLine.enabled = false;
                 }
             }
-            // else
-            // {
-            //     laserLine.SetPosition(1, new Vector3(0f, 0f, laserDistance));
-            // }
         }
     }    
 }
