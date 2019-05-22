@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class SpiderBot : RobotBehavior
 {
-    public float laserDuration, laserDelay;
+    public float laserDuration, laserDelay, laserDistance, engageDistance;
     public Vector3 fudge, laserOffset, engageBuffer;
     public GameObject Player;
 
@@ -29,6 +29,7 @@ public class SpiderBot : RobotBehavior
 
     new void Patrol()
     {
+        // Debug.Log("Patrolling");
         // patrolling from A to B
         if (Vector3.Distance(rb.position, patrolpointA.position) <= patrolDistance)
         {
@@ -51,25 +52,60 @@ public class SpiderBot : RobotBehavior
 
     new void Engage()
     {
+        Debug.Log("Engaging");
         behaviorStatus = Behavior.Engaging;
         // follow player
         agent.destination = Player.transform.position - engageBuffer;
         // fire laser
-        // StartCoroutine("Fire");
+        StartCoroutine("Fire");
+        // set engagement destination, offset by engagementbuffer
         if (Vector3.Distance(transform.position, agent.destination) <= 10)
         {
-            agent.destination = Player.transform.position = engageBuffer;
+            agent.destination = Player.transform.position - engageBuffer;
+        }
+        // reset robot if player has left
+        if (Vector3.Distance(transform.position, agent.destination) >= engageDistance)
+        {
+            // behaviorStatus = originalBehavior;
         }
         // FIXME: Add way for robot to exit "Engage"
     }
 
     IEnumerator Fire()
     {
+        // Debug.Log("Firing");
+        // set starting point of laser, using the laserOffset
         laserLine.SetPosition(0, transform.position + laserOffset);
-        laserLine.enabled = true;
-        laserLine.SetPosition(1, Player.transform.position + fudge); // FIXME: Needs correct fidge factor
-        yield return new WaitForSeconds(laserDuration);
-        laserLine.enabled = false;
-        yield return new WaitForSeconds(laserDelay);
+
+        RaycastHit line;
+        if (Physics.Raycast(transform.position, transform.forward, out line, laserDistance))
+        {
+            if (line.collider)
+            {
+                laserLine.SetPosition(1, line.point);
+                laserLine.enabled = true;
+                if (line.collider.tag == "Player")
+                {
+                    // Debug.Log("Player hit by laser!");
+                    PlayerController x = Player.GetComponent<PlayerController>();
+                    x.Respawn();
+
+                    // reset player position
+                    laserLine.enabled = false;
+                    behaviorStatus = originalBehavior;
+                    transform.position = originalPosition;
+                }
+                else 
+                {
+
+                    yield return new WaitForSeconds(laserDuration);
+                    laserLine.enabled = false;
+                }
+            }
+            // else
+            // {
+            //     laserLine.SetPosition(1, new Vector3(0f, 0f, laserDistance));
+            // }
+        }
     }    
 }

@@ -18,13 +18,15 @@ public class RobotBehavior : MonoBehaviour
     public Behavior behaviorStatus;
     public Transform patrolpointA, patrolpointB;
     
-    // private variables
+    // protected variables
     protected float patrolDistance = 2f;
+    protected static Behavior originalBehavior;
 
     // Unity variables
     protected NavMeshAgent agent;
     protected Rigidbody rb;
     protected RaycastHit detected;
+    protected static Vector3 originalPosition;
 
     // Unity Functions
 
@@ -32,6 +34,9 @@ public class RobotBehavior : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>(); 
         rb = GetComponent<Rigidbody>();
+
+        originalBehavior = behaviorStatus;
+        originalPosition = transform.position;
     }
 
     void Update()

@@ -40,8 +40,8 @@ public class PlayerController : MonoBehaviour
     public float grappleFov = 45f;
 
     public bool grappling = false;
-    public Vector3 grappleOrigin;
-    public Vector3 grappleTarget;
+    public Vector3 grappleOrigin, grappleTarget;
+    public GameObject Spawn;
 
     Rigidbody rb;
     Vector3 moveDirection;
@@ -198,16 +198,17 @@ public class PlayerController : MonoBehaviour
             grappling = false;
         }
 
-        // if (col.gameObject.name == "LineRenderer")
-        // {
-        //     // reset player to last spawn point
-        //     Debug.Log("Player hit by laser!");
-        // }
-
         if (col.gameObject.tag == "Respawn")
         {
-            transform.position = new Vector3(69, 175, 81);
+            // FIXME: create spawn points instead
+            // transform.position = new Vector3(69, 175, 81);
+            Respawn();
         }
+    }
+
+    public void Respawn()
+    {
+        transform.position = Spawn.transform.position;
     }
 
     void OnTriggerEnter(Collider col)
