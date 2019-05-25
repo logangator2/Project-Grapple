@@ -55,7 +55,7 @@ public class ShootingController : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButton(1) && pc.grappleCharging)
+        if (Input.GetMouseButton(1) && pc.grappleCharging || pc.grappling)
         {
             Vector3 grapplePos = new Vector3(Grapple.transform.localPosition.x, Grapple.transform.localPosition.y, Mathf.Lerp(Grapple.transform.localPosition.z, GrappleChargePos, .05f));
             Grapple.transform.localPosition = grapplePos;

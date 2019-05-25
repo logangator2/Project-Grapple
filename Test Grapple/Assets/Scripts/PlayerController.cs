@@ -8,11 +8,11 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
 
-
-    [SerializeField] private AudioClip ding, step, thunk, aimSound, grappleLaunch, reelIn, windSound;
+    public GameObject Spawn;
     [SerializeField] private GameObject crosshairs;
     [SerializeField] private Image anchorHair;
     [SerializeField] private Camera vmCam;
+    [SerializeField] private AudioClip ding, step, thunk, aimSound, grappleLaunch, reelIn, windSound;
 
     public float HSENS = 1f;
     public float VSENS = .8f;
@@ -48,7 +48,6 @@ public class PlayerController : MonoBehaviour
     private bool grounded = true;
 
     public Vector3 grappleTarget;
-    public GameObject Spawn;
     public Vector3 grappleOrigin;
     private RaycastHit grappleHit;
 
@@ -80,6 +79,7 @@ public class PlayerController : MonoBehaviour
         moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
         if (grappling)
         {
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, GRAPPLEFOV, FOVDECELERATION);
             moveDirection *= GRAPPLINGMOVEMENTMODIFIER;
         }
 
@@ -117,7 +117,6 @@ public class PlayerController : MonoBehaviour
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, BASEFOV, FOVDECELERATION * 1.5f);
             }
         }
-
         if (Input.GetMouseButtonDown(1))
         {
             if (grappling)
@@ -165,7 +164,7 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
-        vmCam.fieldOfView = cam.fieldOfView - 5;
+        vmCam.fieldOfView = cam.fieldOfView;
     }
 
     void FixedUpdate()
