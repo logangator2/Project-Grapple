@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
@@ -8,50 +8,57 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
 
-    public float SpeedH = 10f;
-    public float SpeedV = 10f;
-    public float stepRate = 0.5f;
-    public float residualGrappleForce = 30f;
-    public float walkSpeed, sprintSpeed, jumpForce, maxJumpCount, grappleLength, grappleSpeed, grappleDelayTime;
 
-    [SerializeField] private float att_rate = .5f;
-    [SerializeField] private AudioClip swing, ding, hit, step, thunk, aimSound;
-    [SerializeField] private Image aimingHair, anchorHair;
+    [SerializeField] private AudioClip ding, step, thunk, aimSound, grappleLaunch, reelIn, windSound;
+    [SerializeField] private GameObject crosshairs;
+    [SerializeField] private Image anchorHair;
     [SerializeField] private Camera vmCam;
 
-    private AudioSource aud;
-    private Camera cam;
+    public float HSENS = 1f;
+    public float VSENS = .8f;
+    private float WALKSPEED = 5f;
+    private float SPRINTSPEED = 10f;
+    private float JUMPFORCE = 10f;
+    private float MAXJUMPCOUNT = 2f;
+    private float GRAPPLELEN = 500f;
+    private float GRAPPLESPEED = .9f;
+    private float GRAPPLEDELAY = 0.4f;
+    private float STEPRATE = 0.5f;
+    private float BASEFOV = 70f;
+    private float SPRINTFOV = 60f;
+    private float GRAPPLEFOV = 45f;
+    private float MINPITCH = -89.9f;
+    private float MAXPITCH = 89.9f;
+    private float FOVDECELERATION = 0.1f;
+    private float ROTSPEED = 180f;
+    private float GRAPPLECHARGESPEED = 1f;
+    private float MAXGRAPPLELENGTH = 50f;
+    private float RESIDUALGRAPPLEFORCE = 30f;
+    private float GRAPPLINGMOVEMENTMODIFIER = 3.5f;
 
+    private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
     private int collectCount = 0;
+    private float currentGrappleLength = 0f;
     private float upForce = 0f;
-
     private float yaw = 0f;
     private float pitch = 0f;
-    private float minPitch = -89.9f;
-    private float maxPitch = 89.9f;
-    private float FOVDeceleration = 0.2f;
-    private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
+    public bool grappling = false;
     public bool grappleCharging = false;
     private bool canStep = true;
     private bool grounded = true;
-    
-    public float baseFov = 70f;
-    public float sprintFov = 60f;
-    public float grappleFov = 45f;
 
-    public bool grappling = false;
     public Vector3 grappleOrigin;
     public Vector3 grappleTarget;
+    private RaycastHit grappleHit;
 
-    Rigidbody rb;
-    Vector3 moveDirection;
-    RaycastHit grappleHit;
+    private AudioSource aud;
+    private Camera cam;
+    private Rigidbody rb;
+    private Vector3 moveDirection;
 
     void Awake()
     {
         cam = GetComponentInChildren<Camera>();
-        //vmcam = GetComponentInChildren<Camera>();
-
         rb = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
     }
@@ -60,7 +67,7 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        currentSpeed = walkSpeed;
+        currentSpeed = WALKSPEED;
     }
 
     void Update()
@@ -70,6 +77,10 @@ public class PlayerController : MonoBehaviour
         horizontalMovement = Input.GetAxisRaw("Horizontal");
         verticalMovement = Input.GetAxisRaw("Vertical");
         moveDirection = (horizontalMovement * transform.right + verticalMovement * transform.forward).normalized;
+        if (grappling)
+        {
+            moveDirection *= GRAPPLINGMOVEMENTMODIFIER;
+        }
 
         if (grounded && canStep && horizontalMovement + verticalMovement != 0)
         {
@@ -79,26 +90,31 @@ public class PlayerController : MonoBehaviour
         // sprinting
         if (Input.GetKey(KeyCode.LeftShift) && verticalMovement > 0)
         {
-            currentSpeed = sprintSpeed;
+            currentSpeed = SPRINTSPEED;
             if (!grappleCharging)
             {
-                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, sprintFov, FOVDeceleration);
+                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, SPRINTFOV, FOVDECELERATION);
             }
         }
 
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-            currentSpeed = walkSpeed;
+            currentSpeed = WALKSPEED;
         }
 
         if (Input.GetMouseButton(1))
         {
             if (grappleCharging)
             {
-                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, grappleFov, FOVDeceleration);
+                crosshairs.gameObject.transform.Rotate(new Vector3(0, 0, 1) * Time.deltaTime * ROTSPEED);
+                currentGrappleLength = Mathf.Lerp(currentGrappleLength, MAXGRAPPLELENGTH, GRAPPLECHARGESPEED);
+                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, GRAPPLEFOV, FOVDECELERATION);
             }
-        } else if (currentSpeed != sprintSpeed) {
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, baseFov, FOVDeceleration * 1.5f);
+        } else {
+            if (currentSpeed != SPRINTSPEED)
+            {
+                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, BASEFOV, FOVDECELERATION * 1.5f);
+            }
         }
 
         if (Input.GetMouseButtonDown(1))
@@ -110,31 +126,29 @@ public class PlayerController : MonoBehaviour
                 {
                     kickButt.y *= -1;
                 }
-                rb.AddForce(kickButt * residualGrappleForce);
+                rb.AddForce(kickButt * RESIDUALGRAPPLEFORCE);
                 Debug.Log(kickButt);
                 grappling = false;
             } else {
-                aud.PlayOneShot(aimSound, 1.3f);
+                aud.PlayOneShot(aimSound, .1f);
                 grappleCharging = true;
-                aimingHair.gameObject.SetActive(true);
             }
         }
 
         if (Input.GetMouseButtonUp(1) && grappleCharging)
         {
-            aimingHair.gameObject.SetActive(false);
             anchorHair.gameObject.SetActive(false);
             grappleCharging = false;
-
             if (aimedAtAnchor())
             {
                 grappleTarget = LaunchGrapple();
                 grappleOrigin = rb.position;
                 grappling = true;
-            } else
-            {
+            } else {
                 // play whiff sound effect
             }
+            crosshairs.gameObject.transform.rotation = Quaternion.identity;
+            currentGrappleLength = 0f;
         }
 
         // get back cursor
@@ -150,7 +164,6 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
-
         vmCam.fieldOfView = cam.fieldOfView - 5;
     }
 
@@ -161,12 +174,12 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector3(0, 0, 0);
         }
 
-        Move();
-
         if (grappling)
         {
-            transform.position = Vector3.MoveTowards(transform.position, grappleTarget, grappleSpeed);
+            transform.position = Vector3.MoveTowards(transform.position, grappleTarget, GRAPPLESPEED);
         }
+
+        Move();
 
         if (Input.GetMouseButton(1) && grappleCharging)
         {
@@ -193,7 +206,7 @@ public class PlayerController : MonoBehaviour
     {
         if ((col.gameObject.tag == "Anchor" || col.gameObject.tag == "Ground") && grappling)
         {
-            upForce = residualGrappleForce;
+            upForce = RESIDUALGRAPPLEFORCE;
             aud.PlayOneShot(thunk, 0.2f);
             grappling = false;
         }
@@ -213,10 +226,10 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter(Collider col)
     {
 
-        if (col.gameObject.tag == "Ground")
+        if (col.gameObject.tag == "Ground" || col.gameObject.tag == "Anchor")
         {
             grounded = true;
-            currentJumpCount = maxJumpCount;
+            currentJumpCount = MAXJUMPCOUNT;
         }
 
         if (col.gameObject.CompareTag("Pick Up"))
@@ -229,7 +242,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Ground")
+        if (other.gameObject.tag == "Ground" || other.gameObject.tag == "Anchor")
         {
             grounded = false;
         }
@@ -237,9 +250,9 @@ public class PlayerController : MonoBehaviour
 
     void CameraRotate()
     {
-        yaw += Input.GetAxis("Mouse X") * SpeedH;
-        pitch -= Input.GetAxis("Mouse Y") * SpeedV;
-        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        yaw += Input.GetAxis("Mouse X") * HSENS;
+        pitch -= Input.GetAxis("Mouse Y") * VSENS;
+        pitch = Mathf.Clamp(pitch, MINPITCH, MAXPITCH);
         transform.eulerAngles = new Vector3(0f, yaw, 0f);
         cam.transform.eulerAngles = new Vector3(pitch, yaw, 0f);
     }
@@ -254,7 +267,7 @@ public class PlayerController : MonoBehaviour
         if (currentJumpCount != 0)
         {
             // from https://www.noob-programmer.com/unity3d/how-to-make-player-object-jump-in-unity-3d/
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
+            rb.AddForce(new Vector3(0, JUMPFORCE, 0), ForceMode.Impulse);
             currentJumpCount -= 1;
         }
     }
@@ -264,7 +277,7 @@ public class PlayerController : MonoBehaviour
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         if (Physics.Raycast(ray, out hitspot))
         {
-            if (hitspot.point != null && hitspot.collider.tag == "Anchor")
+            if (hitspot.point != null && hitspot.collider.tag == "Anchor" && hitspot.distance <= currentGrappleLength)
             {
                 return true;
             }
@@ -277,9 +290,10 @@ public class PlayerController : MonoBehaviour
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         if (Physics.Raycast(ray, out hitspot))
         {
+            Debug.Log(currentGrappleLength);
             if (hitspot.point != null && hitspot.collider.tag == "Anchor")
             {
-                aud.PlayOneShot(hit, 0.5F);
+                aud.PlayOneShot(grappleLaunch, 1.1F);
                 return hitspot.point;
             }
         }
@@ -291,12 +305,12 @@ public class PlayerController : MonoBehaviour
         aud.PlayOneShot(step, 0.1f);
         canStep = false;
         
-        if(currentSpeed == sprintSpeed)
+        if(currentSpeed == SPRINTSPEED)
         {
-            yield return new WaitForSeconds(stepRate / 1.5f);
+            yield return new WaitForSeconds(STEPRATE / 1.5f);
         } else
         {
-            yield return new WaitForSeconds(stepRate);
+            yield return new WaitForSeconds(STEPRATE);
         }
 
         canStep = true;
