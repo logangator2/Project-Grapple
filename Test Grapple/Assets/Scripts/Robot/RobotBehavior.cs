@@ -68,14 +68,14 @@ public class RobotBehavior : MonoBehaviour
     {
         if (Vector3.Distance(rb.position, patrolpointA.position) <= patrolDistance)
         {
+            // ADD: search here
             agent.destination = patrolpointB.position;
         }
         else if (Vector3.Distance(rb.position, patrolpointB.position) <= patrolDistance)
         {
+            // ADD: search here
             agent.destination = patrolpointA.position;
         }
-
-        // if player detected, engage
     }
 
     protected void Engage()
