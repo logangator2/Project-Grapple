@@ -60,6 +60,7 @@ public class RobotBehavior : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+        // alert doors
     }
 
     // Custom Functions
