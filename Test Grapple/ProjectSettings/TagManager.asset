@@ -9,6 +9,8 @@ TagManager:
   - Anchor
   - Crosshair
   - Nail
+  - Robot
+  - Door
   layers:
   - Default
   - TransparentFX
