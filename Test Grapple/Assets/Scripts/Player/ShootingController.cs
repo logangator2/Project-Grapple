@@ -47,11 +47,7 @@ public class ShootingController : MonoBehaviour
 
             if (gunLoaded && !pc.grappleCharging)
             {
-                Instantiate(NailPrefab, cam.transform.position + (cam.transform.forward * 1.5f), cam.transform.rotation * Quaternion.Euler(90f, 0, 0));
-                auds.PlayOneShot(fireSound, 1.0f);
-                muzzle.Play();
-                Gun.transform.localPosition += Vector3.back * .6f;
-                StartCoroutine(reload());
+                fire();
             }
         }
 
@@ -78,6 +74,26 @@ public class ShootingController : MonoBehaviour
         Vector3 gunPos = new Vector3(Gun.transform.localPosition.x, Gun.transform.localPosition.y, Mathf.Lerp(Gun.transform.localPosition.z, GunStartPos, 0.02f));
         Gun.transform.localPosition = gunPos;
     }
+
+    void fire()
+    {
+        
+        RaycastHit hitspot;
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
+        if (Physics.Raycast(ray, out hitspot))
+        {
+            if (hitspot.point != null)
+            {
+                Instantiate(NailPrefab, hitspot.point, cam.transform.rotation * Quaternion.Euler(90f, 0, 0));
+            }
+        }
+
+        auds.PlayOneShot(fireSound, 1.0f);
+        muzzle.Play();
+        Gun.transform.localPosition += Vector3.back * .4f;
+        StartCoroutine(reload());
+    }
+
     IEnumerator reload()
     {
         gunLoaded = false;
