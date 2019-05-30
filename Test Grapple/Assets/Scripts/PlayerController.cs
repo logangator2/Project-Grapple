@@ -217,6 +217,15 @@ public class PlayerController : MonoBehaviour
             // transform.position = new Vector3(69, 175, 81);
             Respawn();
         }
+
+        if (col.gameObject.tag == "Platform")
+        {
+            this.transform.parent = col.transform.parent;
+        }
+        else
+        {
+            this.transform.parent = null;
+        }
     }
 
     public void Respawn()
