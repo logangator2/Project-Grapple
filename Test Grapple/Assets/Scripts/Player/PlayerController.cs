@@ -13,8 +13,8 @@ public class PlayerController : MonoBehaviour
 
     public float HSENS = 1f;
     public float VSENS = .8f;
-    private float WALKSPEED = 5f;
-    private float SPRINTSPEED = 10f;
+    private float WALKSPEED = 10f;
+    private float SPRINTSPEED = 18f;
     private float JUMPFORCE = 10f;
     private float MAXJUMPCOUNT = 2f;
     private float GRAPPLELEN = 500f;
