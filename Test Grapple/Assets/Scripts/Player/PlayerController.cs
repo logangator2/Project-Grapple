@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private Camera vmCam;
     [SerializeField]
     private AudioClip ding, step, thunk, aimSound, grappleLaunch, reelIn, windSound;
+    private static PlayerController playerInstance;
 
     public float HSENS = 1f;
     public float VSENS = .8f;
@@ -44,11 +45,15 @@ public class PlayerController : MonoBehaviour
     public bool grappling = false;
     public bool grappleCharging = false;
     private bool canStep = true;
+    public bool multispawn = false;
+    public int spawnIndex = 0;
     private int currentCollidingGrounds = 0;
 
     public Vector3 grappleTarget;
     public Vector3 grappleOrigin;
     private RaycastHit grappleHit;
+
+    public Vector3 spawnPoint;
 
     private AudioSource aud;
     private Camera cam;
@@ -60,6 +65,16 @@ public class PlayerController : MonoBehaviour
         cam = GetComponentInChildren<Camera>();
         rb = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
+        DontDestroyOnLoad(this);
+        if (playerInstance == null)
+        {
+            playerInstance = this;
+        }
+        else
+        {
+            //playerInstance.transform.position = spawnPoint;
+            Destroy(gameObject);
+        }
     }
 
     void Start()
@@ -67,6 +82,10 @@ public class PlayerController : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = WALKSPEED;
+        if (multispawn == true && spawnPoint != new Vector3(0,0,0))
+        {
+            playerInstance.transform.position = spawnPoint;
+        }
     }
 
     void Update()
@@ -211,12 +230,24 @@ public class PlayerController : MonoBehaviour
         {
             this.transform.parent = null;
         }
+        if (col.gameObject.tag == "Checkpoint")
+        {
+            spawnPoint = col.transform.parent.position;
+        }
     }
 
     public void Respawn()
     {
-        transform.position = Spawn.transform.position;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (multispawn == false)
+        {
+            transform.position = Spawn.transform.position;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        else
+        {
+            transform.position = spawnPoint;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 
     void OnTriggerEnter(Collider col)

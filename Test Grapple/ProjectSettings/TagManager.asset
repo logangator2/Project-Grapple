@@ -12,6 +12,7 @@ TagManager:
   - Robot
   - Door
   - Platform
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
