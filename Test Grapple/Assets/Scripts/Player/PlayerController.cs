@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     public float VSENS = .8f;
     private float WALKSPEED = 10f;
     private float SPRINTSPEED = 18f;
-    private float JUMPFORCE = 10f;
+    private float JUMPFORCE = 13f;
     private float MAXJUMPCOUNT = 2f;
     private float GRAPPLELEN = 500f;
     private float GRAPPLESPEED = .9f;
@@ -32,7 +32,6 @@ public class PlayerController : MonoBehaviour
     private float MAXGRAPPLELENGTH = 50f;
     private float RESIDUALGRAPPLEFORCE = 30f;
     private float GRAPPLINGMOVEMENTMODIFIER = 3.5f;
-
     private float horizontalMovement, verticalMovement, currentSpeed, currentJumpCount;
     private int collectCount = 0;
     private float currentGrappleLength = 0f;
@@ -42,7 +41,7 @@ public class PlayerController : MonoBehaviour
     public bool grappling = false;
     public bool grappleCharging = false;
     private bool canStep = true;
-    private bool grounded = true;
+    private int currentCollidingGrounds = 0;
 
     public Vector3 grappleTarget;
     public Vector3 grappleOrigin;
@@ -80,7 +79,7 @@ public class PlayerController : MonoBehaviour
             moveDirection *= GRAPPLINGMOVEMENTMODIFIER;
         }
 
-        if (grounded && canStep && horizontalMovement + verticalMovement != 0)
+        if (currentCollidingGrounds > 0 && canStep && horizontalMovement + verticalMovement != 0)
         {
             StartCoroutine(StepDelay());
         }
@@ -206,9 +205,9 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter(Collider col)
     {
 
-        if (col.gameObject.tag == "Ground" || col.gameObject.tag == "Anchor")
+        if (col.gameObject.tag == "Ground" || col.gameObject.tag == "Anchor" || col.gameObject.tag == "Robot")
         {
-            grounded = true;
+            currentCollidingGrounds++;
             currentJumpCount = MAXJUMPCOUNT;
         }
 
@@ -222,9 +221,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Ground" || other.gameObject.tag == "Anchor")
+        if (other.gameObject.tag == "Ground" || other.gameObject.tag == "Anchor" || other.gameObject.tag == "Robot")
         {
-            grounded = false;
+            currentCollidingGrounds--;
         }
     }
 
