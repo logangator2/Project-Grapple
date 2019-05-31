@@ -9,8 +9,10 @@ public class PlayerController : MonoBehaviour
 {
 
     public GameObject Spawn;
-    [SerializeField] private Camera vmCam;
-    [SerializeField] private AudioClip ding, step, thunk, aimSound, grappleLaunch, reelIn, windSound;
+    [SerializeField]
+    private Camera vmCam;
+    [SerializeField]
+    private AudioClip ding, step, thunk, aimSound, grappleLaunch, reelIn, windSound;
 
     public float HSENS = 1f;
     public float VSENS = .8f;
@@ -107,7 +109,9 @@ public class PlayerController : MonoBehaviour
                 currentGrappleLength = Mathf.Lerp(currentGrappleLength, MAXGRAPPLELENGTH, GRAPPLECHARGESPEED);
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, CHARGINGFOV, FOVDECELERATION);
             }
-        } else {
+        }
+        else
+        {
             if (currentSpeed != SPRINTSPEED)
             {
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, BASEFOV, FOVDECELERATION * 1.5f);
@@ -125,7 +129,9 @@ public class PlayerController : MonoBehaviour
                 rb.AddForce(kickButt * RESIDUALGRAPPLEFORCE);
                 Debug.Log(kickButt);
                 grappling = false;
-            } else {
+            }
+            else
+            {
                 aud.PlayOneShot(aimSound, .1f);
                 grappleCharging = true;
             }
@@ -175,7 +181,7 @@ public class PlayerController : MonoBehaviour
 
         // Physics steps
 
-        if(upForce > 0)
+        if (upForce > 0)
         {
             rb.AddForce(new Vector3(0, upForce, 0));
             upForce -= Time.deltaTime * 30f;
@@ -185,7 +191,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision col)
     {
-        if ((col.gameObject.tag == "Anchor" || col.gameObject.tag == "Ground" || col.gameObject.tag == "Robot") && grappling)
+        if ((col.gameObject.tag == "Anchor" || col.gameObject.tag == "Ground" || col.gameObject.tag == "Robot" || col.gameObject.tag == "Platform") && grappling)
         {
             upForce = RESIDUALGRAPPLEFORCE;
             aud.PlayOneShot(thunk, 0.2f);
@@ -195,6 +201,15 @@ public class PlayerController : MonoBehaviour
         if (col.gameObject.tag == "Respawn")
         {
             Respawn();
+        }
+
+        if (col.gameObject.tag == "Platform")
+        {
+            this.transform.parent = col.transform.parent;
+        }
+        else
+        {
+            this.transform.parent = null;
         }
     }
 
@@ -207,7 +222,7 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter(Collider col)
     {
 
-        if (col.gameObject.tag == "Ground" || col.gameObject.tag == "Anchor" || col.gameObject.tag == "Robot")
+        if (col.gameObject.tag == "Ground" || col.gameObject.tag == "Anchor" || col.gameObject.tag == "Robot" || col.gameObject.tag == "Platform")
         {
             currentCollidingGrounds++;
             currentJumpCount = MAXJUMPCOUNT;
@@ -259,7 +274,7 @@ public class PlayerController : MonoBehaviour
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         if (Physics.Raycast(ray, out hitspot))
         {
-            if (hitspot.point != null && ( hitspot.collider.tag == "Anchor" || hitspot.collider.tag == "Robot" ) && hitspot.distance <= currentGrappleLength)
+            if (hitspot.point != null && (hitspot.collider.tag == "Anchor" || hitspot.collider.tag == "Robot") && hitspot.distance <= currentGrappleLength)
             {
                 return true;
             }
@@ -286,11 +301,12 @@ public class PlayerController : MonoBehaviour
     {
         aud.PlayOneShot(step, 0.4f);
         canStep = false;
-        
-        if(currentSpeed == SPRINTSPEED)
+
+        if (currentSpeed == SPRINTSPEED)
         {
             yield return new WaitForSeconds(STEPRATE / 2f);
-        } else
+        }
+        else
         {
             yield return new WaitForSeconds(STEPRATE);
         }
