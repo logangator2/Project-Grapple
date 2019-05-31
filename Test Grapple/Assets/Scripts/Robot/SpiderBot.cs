@@ -7,7 +7,6 @@ public class SpiderBot : RobotBehavior
 {
     public float laserDuration, laserDelay, laserDistance, engageDistance;
     public Vector3 laserOffset, engageBuffer;
-    public GameObject Player;
 
     private LineRenderer laserLine;
 

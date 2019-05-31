@@ -23,6 +23,7 @@ public class RobotBehavior : MonoBehaviour
     protected static Behavior originalBehavior;
 
     // Unity variables
+    protected GameObject Player;
     protected NavMeshAgent agent;
     protected Rigidbody rb;
     protected RaycastHit detected;
@@ -37,6 +38,11 @@ public class RobotBehavior : MonoBehaviour
 
         originalBehavior = behaviorStatus;
         originalPosition = transform.position;
+    }
+
+    void Start()
+    {
+        Player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Update()

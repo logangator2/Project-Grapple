@@ -14,6 +14,7 @@ public class DoorMechanic : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         closePosition = rb.position;
+        // FIXME: Causes the door to fly upwards in non-testing environment
         openPosition = new Vector3(0f, rb.position.y * 3, 0f);
     }
 
