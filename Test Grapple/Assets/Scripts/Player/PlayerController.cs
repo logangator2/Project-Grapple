@@ -46,7 +46,6 @@ public class PlayerController : MonoBehaviour
     public bool grappleCharging = false;
     private bool canStep = true;
     public bool multispawn = false;
-    public int spawnIndex = 0;
     private int currentCollidingGrounds = 0;
 
     public Vector3 grappleTarget;
@@ -65,15 +64,18 @@ public class PlayerController : MonoBehaviour
         cam = GetComponentInChildren<Camera>();
         rb = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
-        DontDestroyOnLoad(this);
-        if (playerInstance == null)
+        if (multispawn == true)
         {
-            playerInstance = this;
-        }
-        else
-        {
-            //playerInstance.transform.position = spawnPoint;
-            Destroy(gameObject);
+            DontDestroyOnLoad(this);
+            if (playerInstance == null)
+            {
+                playerInstance = this;
+            }
+            else
+            {
+                //playerInstance.transform.position = spawnPoint;
+                Destroy(gameObject);
+            }
         }
     }
 
