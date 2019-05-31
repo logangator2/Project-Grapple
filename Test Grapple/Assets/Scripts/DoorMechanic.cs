@@ -14,6 +14,7 @@ public class DoorMechanic : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         closePosition = rb.position;
+        // FIXME: Causes the door to fly upwards in non-testing environment
         openPosition = new Vector3(0f, rb.position.y * 3, 0f);
     }
 
@@ -40,12 +41,12 @@ public class DoorMechanic : MonoBehaviour
     public void Open()
     {
         rb.position = Vector3.MoveTowards(rb.position, openPosition, Time.deltaTime * speed);
-        Debug.Log("Door Opened");
+        // Debug.Log("Door Opened");
     }
     public void Close()
     {
         rb.position = closePosition;
-        Debug.Log("Door Closed");
+        // Debug.Log("Door Closed");
     }
 
     // IEnumerator Wait()

@@ -9,7 +9,6 @@ public class FlyingBot : RobotBehavior
     // private variables
 
     // Unity variables
-    public GameObject Player;
     private Vector3 _angles;
     private AudioSource aud;
 
@@ -21,6 +20,8 @@ public class FlyingBot : RobotBehavior
         aud = GetComponent<AudioSource>();
         aud.loop = true;
         _angles = new Vector3();
+
+        Player = GameObject.FindGameObjectWithTag("Player");
     }
 
     // Update is called once per frame

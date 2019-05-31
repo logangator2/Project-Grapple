@@ -7,13 +7,13 @@ public class SpiderBot : RobotBehavior
 {
     public float laserDuration, laserDelay, laserDistance, engageDistance;
     public Vector3 laserOffset, engageBuffer;
-    public GameObject Player;
 
     private LineRenderer laserLine;
 
     void Start()
     {
         laserLine = GetComponent<LineRenderer>();
+        Player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Update()
@@ -52,7 +52,7 @@ public class SpiderBot : RobotBehavior
 
     new void Engage()
     {
-        Debug.Log("Engaging");
+        // Debug.Log("Engaging");
         behaviorStatus = Behavior.Engaging;
         // follow player
         agent.destination = Player.transform.position - engageBuffer;
