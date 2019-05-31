@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
 // FPS camera movement from: https://answers.unity.com/questions/1087351/limit-vertical-rotation-of-camera.html
@@ -200,6 +201,7 @@ public class PlayerController : MonoBehaviour
     public void Respawn()
     {
         transform.position = Spawn.transform.position;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void OnTriggerEnter(Collider col)
