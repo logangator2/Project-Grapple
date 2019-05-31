@@ -52,7 +52,7 @@ public class SpiderBot : RobotBehavior
 
     new void Engage()
     {
-        Debug.Log("Engaging");
+        // Debug.Log("Engaging");
         behaviorStatus = Behavior.Engaging;
         // follow player
         agent.destination = Player.transform.position - engageBuffer;
