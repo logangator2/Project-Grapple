@@ -13,6 +13,7 @@ public class SpiderBot : RobotBehavior
     void Start()
     {
         laserLine = GetComponent<LineRenderer>();
+        Player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Update()
