@@ -265,7 +265,14 @@ public class PlayerController : MonoBehaviour
         {
             col.gameObject.SetActive(false);
             aud.PlayOneShot(ding, 0.3f);
-            collectCount++;
+            if (SceneManager.GetActiveScene().buildIndex < 5)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+            else
+            {
+                SceneManager.LoadScene(0);
+            }
         }
     }
 
