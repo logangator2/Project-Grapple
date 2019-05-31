@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     private float MAXPITCH = 89.9f;
     private float FOVDECELERATION = 0.05f;
     private float GRAPPLECHARGESPEED = 1f;
+    [SerializeField]
     private float MAXGRAPPLELENGTH = 50f;
     private float RESIDUALGRAPPLEFORCE = 30f;
     private float GRAPPLINGMOVEMENTMODIFIER = 3.5f;
@@ -64,6 +65,18 @@ public class PlayerController : MonoBehaviour
         cam = GetComponentInChildren<Camera>();
         rb = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
+        
+    }
+
+    void Start()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        currentSpeed = WALKSPEED;
+        if (multispawn == true && spawnPoint != new Vector3(0,0,0))
+        {
+            playerInstance.transform.position = spawnPoint;
+        }
         if (multispawn == true)
         {
             DontDestroyOnLoad(this);
@@ -76,17 +89,6 @@ public class PlayerController : MonoBehaviour
                 //playerInstance.transform.position = spawnPoint;
                 Destroy(gameObject);
             }
-        }
-    }
-
-    void Start()
-    {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        currentSpeed = WALKSPEED;
-        if (multispawn == true && spawnPoint != new Vector3(0,0,0))
-        {
-            playerInstance.transform.position = spawnPoint;
         }
     }
 
