@@ -79,7 +79,7 @@ PrefabInstance:
     - target: {fileID: 2151420824556502817, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
       propertyPath: m_Name
-      value: 4_Roki
+      value: 4_Roki Juiced
       objectReference: {fileID: 0}
     - target: {fileID: 2151420824556502847, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
@@ -135,6 +135,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
+        type: 3}
+      propertyPath: behaviorStatus
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1266657230, guid: 454a384ea097b46fba95f64b669d5f33, type: 3}
       propertyPath: m_LocalPosition.x
