@@ -14,7 +14,7 @@ public class RobotBehavior : MonoBehaviour
     }
 
     // public variables
-    public float alertDistance, fallSpeed, deathX, deathY, deathZ;
+    public float alertDistance, fallSpeed;
     public Behavior behaviorStatus;
     public Transform patrolpointA, patrolpointB;
     
@@ -27,9 +27,9 @@ public class RobotBehavior : MonoBehaviour
     protected NavMeshAgent agent;
     protected Rigidbody rb;
     protected RaycastHit detected;
-    [SerializeField] protected Vector3 targetAngle = new Vector3(90f, 0f, 0f);
+    // [SerializeField] protected Vector3 targetAngle = new Vector3(90f, 0f, 0f);
     protected Vector3 currentAngle;
-    protected Quaternion from, to;
+    [SerializeField] protected Quaternion from, to;
     protected static Vector3 originalPosition;
 
     // Unity Functions
@@ -39,7 +39,7 @@ public class RobotBehavior : MonoBehaviour
         agent = GetComponent<NavMeshAgent>(); 
         rb = GetComponent<Rigidbody>();
         from = transform.GetChild(1).rotation;
-        to = new Quaternion(90f, 90f, 90f, 0f);
+        // to = new Quaternion(90f, 90f, 90f, 0f);
 
         originalBehavior = behaviorStatus;
         originalPosition = transform.position;
@@ -72,7 +72,6 @@ public class RobotBehavior : MonoBehaviour
         {
             Die();
         }
-        // alert doors
     }
 
     // Custom Functions
@@ -103,17 +102,23 @@ public class RobotBehavior : MonoBehaviour
 
     protected void Die()
     {
-        // Lerp fall
-        // transform.Rotate (targetAngle * (fallSpeed * Time.deltaTime));
-        // transform.Rotate(deathX, deathY, deathZ, Space.World);
-        transform.GetChild(1).rotation = Quaternion.Lerp(from, to, Time.time * fallSpeed);
-        // currentAngle = new Vector3(
-        //      Mathf.LerpAngle(currentAngle.x, targetAngle.x, Time.deltaTime * fallSpeed),
-        //      Mathf.LerpAngle(currentAngle.y, targetAngle.y, Time.deltaTime * fallSpeed),
-        //      Mathf.LerpAngle(currentAngle.z, targetAngle.z, Time.deltaTime * fallSpeed));
- 
-        //  transform.eulerAngles = currentAngle;
-        // destroy everything except the model
-        gameObject.SetActive(false);
+        // Temporary Fix, remove and uncomment "destroy everything..." code below when rotation works
+        Destroy(gameObject);
+
+        // Fall - Kind of Working
+        // transform.GetChild(1).rotation = Quaternion.RotateTowards(from, to, Time.deltaTime * fallSpeed);
+
+        // Not Working
+        // transform.GetChild(1).rotation = Quaternion.Slerp(from, to, Time.deltaTime * fallSpeed);
+        // transform.GetChild(1).rotation = Quaternion.Lerp(from, to, Time.deltaTime * fallSpeed);
+        // transform.GetChild(1).Rotate(90f, 90f, 90f, 0f);
+        // transform.position = new Vector3(transform.position.x, transform.position.y - 2, transform.position.z);
+
+        // destroy everything except the model - Working
+        // var x = gameObject.GetComponent<BoxCollider>();
+        // x.enabled = false;
+        // Destroy(rb);
+        // var script = GetComponent<RobotBehavior>(); 
+        // script.enabled = false;
     }
 }

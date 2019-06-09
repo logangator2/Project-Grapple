@@ -241,13 +241,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alertDistance: 25
   fallSpeed: 0
-  deathX: 0
-  deathY: 0
-  deathZ: 0
   behaviorStatus: 0
   patrolpointA: {fileID: 0}
   patrolpointB: {fileID: 0}
-  targetAngle: {x: 90, y: 0, z: 0}
+  from: {x: 0, y: 0, z: 0, w: 0}
+  to: {x: 0, y: 0, z: 0, w: 0}
 --- !u!82 &362915320
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1184,7 +1182,7 @@ PrefabInstance:
     - target: {fileID: 2151420824556502847, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 9
+      value: -17.68
       objectReference: {fileID: 0}
     - target: {fileID: 2151420824556502847, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
@@ -1249,7 +1247,7 @@ PrefabInstance:
     - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
       propertyPath: fallSpeed
-      value: 100
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
@@ -1280,6 +1278,26 @@ PrefabInstance:
         type: 3}
       propertyPath: deathX
       value: 999
+      objectReference: {fileID: 0}
+    - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
+        type: 3}
+      propertyPath: to.x
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
+        type: 3}
+      propertyPath: to.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
+        type: 3}
+      propertyPath: to.z
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2151420824556502818, guid: 454a384ea097b46fba95f64b669d5f33,
+        type: 3}
+      propertyPath: to.w
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2151420824556502819, guid: 454a384ea097b46fba95f64b669d5f33,
         type: 3}
@@ -1368,6 +1386,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RobotSpawner
+      objectReference: {fileID: 0}
+    - target: {fileID: 5529651181976878618, guid: b570dc85add7e4523a4570a1871dbe3b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5529651181976878616, guid: b570dc85add7e4523a4570a1871dbe3b,
         type: 3}
