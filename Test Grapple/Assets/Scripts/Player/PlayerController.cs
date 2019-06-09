@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // some movement from source: https://www.mvcode.com/lessons/first-person-camera-and-controller-jamie
 // FPS camera movement from: https://answers.unity.com/questions/1087351/limit-vertical-rotation-of-camera.html
@@ -48,6 +49,12 @@ public class PlayerController : MonoBehaviour
     private bool canStep = true;
     public bool multispawn = false;
     private int currentCollidingGrounds = 0;
+
+    public Image black;
+    public Image white;
+    public Animator blackFadeAnim;
+    public Animator whiteFadeAnim;
+    
 
     public Vector3 grappleTarget;
     public Vector3 grappleOrigin;
@@ -242,16 +249,7 @@ public class PlayerController : MonoBehaviour
 
     public void Respawn()
     {
-        if (multispawn == false)
-        {
-            transform.position = Spawn.transform.position;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-        else
-        {
-            transform.position = spawnPoint;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+        StartCoroutine(WhiteFade());
     }
 
     void OnTriggerEnter(Collider col)
@@ -267,14 +265,7 @@ public class PlayerController : MonoBehaviour
         {
             col.gameObject.SetActive(false);
             aud.PlayOneShot(ding, 0.3f);
-            if (SceneManager.GetActiveScene().buildIndex < 5)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            }
-            else
-            {
-                SceneManager.LoadScene(0);
-            }
+            StartCoroutine(BlackFade());
         }
     }
 
@@ -354,5 +345,40 @@ public class PlayerController : MonoBehaviour
         }
 
         canStep = true;
+    }
+
+    // Help from youtube.com/watch?v=iV-igTT5yE4
+    IEnumerator BlackFade()
+    {
+        blackFadeAnim.SetBool("Fade", true);
+        yield return new WaitUntil(() => black.color.a == 1);
+        if (SceneManager.GetActiveScene().buildIndex < 5)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
+        }
+    }
+
+    IEnumerator WhiteFade()
+    {
+        whiteFadeAnim.SetBool("Fade", true);
+        yield return new WaitUntil(() => white.color.a == 1);
+        if (multispawn == false)
+        {
+            transform.position = Spawn.transform.position;
+        }
+        else
+        {
+            transform.position = spawnPoint;
+        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    IEnumerator WaitDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
     }
 }
