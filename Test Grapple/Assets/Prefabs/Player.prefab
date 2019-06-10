@@ -215,7 +215,7 @@ Transform:
   m_GameObject: {fileID: 5282887278937049917}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.01, y: 0.16, z: 2.36}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 5282887278975214533}
   m_RootOrder: 0
@@ -410,7 +410,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 0.48235294}
+      maxColor: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 0.3647059}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -794,7 +794,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: -0.2
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -4885,7 +4885,7 @@ ParticleSystem:
 --- !u!199 &5282887278937049919
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9755,7 +9755,7 @@ ParticleSystem:
 --- !u!199 &5282887279893008573
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9833,7 +9833,7 @@ GameObject:
   - component: {fileID: 5282887279931900651}
   - component: {fileID: 5282887279931900650}
   - component: {fileID: 5282887279931900646}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -10437,7 +10437,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 311
+    m_Bits: 1335
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -10718,18 +10718,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5282887280610996321}
     m_Modifications:
-    - target: {fileID: 100002, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
-      propertyPath: m_Name
-      value: Grapple
-      objectReference: {fileID: 0}
-    - target: {fileID: 100002, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.0060002
@@ -10773,6 +10761,18 @@ PrefabInstance:
     - target: {fileID: 400002, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
+      propertyPath: m_Name
+      value: Grapple
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 45f8d11b67ffbf24fa36617cea8f2e75, type: 3}
       propertyPath: m_LocalRotation.x
