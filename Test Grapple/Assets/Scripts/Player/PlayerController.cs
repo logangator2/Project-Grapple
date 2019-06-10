@@ -358,7 +358,7 @@ public class PlayerController : MonoBehaviour
     {
         blackFadeAnim.SetBool("Fade", true);
         yield return new WaitUntil(() => black.color.a == 1);
-        if (SceneManager.GetActiveScene().buildIndex < 5)
+        if (SceneManager.GetActiveScene().buildIndex < 6)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
