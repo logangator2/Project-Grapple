@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -305,7 +305,10 @@ public class PlayerController : MonoBehaviour
     {
         RaycastHit hitspot;
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-        if (Physics.Raycast(ray, out hitspot))
+        int mask = 1 << 10;
+        mask = ~mask;
+
+        if (Physics.Raycast(ray, out hitspot, Mathf.Infinity, mask))
         {
             if (hitspot.point != null && (hitspot.collider.tag == "Anchor" || hitspot.collider.tag == "Robot") && hitspot.distance <= currentGrappleLength)
             {
@@ -318,7 +321,10 @@ public class PlayerController : MonoBehaviour
     {
         RaycastHit hitspot;
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-        if (Physics.Raycast(ray, out hitspot))
+        int mask = 1 << 10;
+        mask = ~mask;
+
+        if (Physics.Raycast(ray, out hitspot, Mathf.Infinity, mask))
         {
             Debug.Log(currentGrappleLength);
             if (hitspot.point != null && hitspot.collider.tag == "Anchor")
