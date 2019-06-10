@@ -13,4 +13,8 @@ public class LoadOnClick : MonoBehaviour
         LoadingImage.SetActive(true);
         SceneManager.LoadScene(level);
     }
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }
