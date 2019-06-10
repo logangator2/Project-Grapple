@@ -80,7 +80,9 @@ public class ShootingController : MonoBehaviour
         
         RaycastHit hitspot;
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-        if (Physics.Raycast(ray, out hitspot))
+        int mask = 1 << 10;
+        mask = ~mask; 
+        if (Physics.Raycast(ray, out hitspot, Mathf.Infinity, mask))
         {
             if (hitspot.point != null)
             {
