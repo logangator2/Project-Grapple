@@ -249,7 +249,15 @@ public class PlayerController : MonoBehaviour
 
     public void Respawn()
     {
-        StartCoroutine(WhiteFade());
+        if (multispawn)
+        {
+            transform.position = spawnPoint;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+        else
+        {
+            StartCoroutine(WhiteFade());
+        }
     }
 
     void OnTriggerEnter(Collider col)
@@ -375,12 +383,8 @@ public class PlayerController : MonoBehaviour
         if (multispawn == false)
         {
             transform.position = Spawn.transform.position;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-        else
-        {
-            transform.position = spawnPoint;
-        }
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     IEnumerator WaitDelay(float delay)

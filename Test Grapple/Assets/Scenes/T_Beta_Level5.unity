@@ -34578,6 +34578,14 @@ PrefabInstance:
       propertyPath: MAXGRAPPLELENGTH
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 415777010, guid: 3d44d43156c113b4eb3ab402214ae027, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 771135655, guid: 3d44d43156c113b4eb3ab402214ae027, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d44d43156c113b4eb3ab402214ae027, type: 3}
 --- !u!4 &1792616506 stripped
